@@ -4,6 +4,22 @@
   "description": "MCP server for MainWP Dashboard WordPress site management",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "mainwp-mcp": "dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cvsloane/mainwp-mcp.git"
+  },
+  "homepage": "https://github.com/cvsloane/mainwp-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/cvsloane/mainwp-mcp/issues"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
