@@ -38,30 +38,52 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 
 ## Features
 
-### Site Management
-- **List Sites**: View all connected WordPress sites with detailed information
-- **Site Details**: Get comprehensive data including WordPress version, PHP version, plugins, themes, and health status
-- **Health Checks**: Run health checks to identify issues
-- **Sync**: Force synchronization to get the latest site data
-- **Add/Remove**: Add new sites or disconnect existing ones
+**43 tools** covering the complete MainWP REST API:
 
-### Update Management
+### Site Management (14 tools)
+- **List & View**: List all sites, get detailed site information, count sites
+- **Health**: Run health checks, track non-MainWP changes
+- **Sync**: Force synchronization to get the latest site data
+- **Lifecycle**: Add, reconnect, disconnect, suspend, unsuspend, remove sites
+- **Edit**: Modify site settings and group assignments
+
+### Update Management (9 tools)
 - **Update Overview**: See all pending updates across your entire network
 - **WordPress Core**: Update WordPress to the latest version
 - **Plugins**: Update individual or all plugins
 - **Themes**: Update individual or all themes
+- **Translations**: Update site translations
+- **Ignore Management**: Ignore/unignore specific updates, list ignored updates
 - **Dry-Run Mode**: Preview what updates would be applied without making changes
 
-### Plugin & Theme Management
-- **Inventory**: List all plugins/themes installed on any site
+### Plugin Management (5 tools)
+- **Inventory**: List all plugins installed on any site
 - **Activation**: Activate or deactivate plugins
-- **Theme Switching**: Change the active theme on any site
+- **Installation**: Install plugins from WordPress.org
+- **Removal**: Delete unused plugins
+
+### Theme Management (4 tools)
+- **Inventory**: List all themes installed on any site
+- **Activation**: Change the active theme on any site
+- **Installation**: Install themes from WordPress.org
+- **Removal**: Delete unused themes
+
+### Client Management (5 tools) - Pro
+- **CRM**: List, add, edit, delete clients
+- **Site Assignment**: Assign sites to clients
+
+### Cost Tracking (5 tools) - Pro
+- **Expenses**: Track plugin, theme, hosting, domain, and service costs
+- **Renewals**: Monitor recurring costs and renewal dates
+
+### Tag Management (2 tools)
+- **Organization**: List all tags, get sites by tag
 
 ### Safety & Security
 - **Dry-Run by Default**: All destructive operations simulate first
 - **Bulk Confirmation**: Multi-site operations require explicit confirmation
 - **Rate Limiting**: Prevents overwhelming your servers
-- **Audit Trail**: All operations are logged
+- **Pro Feature Handling**: Clear error messages when Pro extensions are required
 
 ---
 
@@ -544,6 +566,260 @@ Activate a theme on a site.
 |------|------|----------|-------------|
 | `site_id` | string | Yes | The site ID |
 | `theme` | string | Yes | Theme slug to activate |
+
+#### `mainwp_themes_install`
+Install a theme from WordPress.org.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | Yes | Site ID or domain |
+| `slug` | string | Yes | Theme slug from WordPress.org |
+| `dry_run` | boolean | No | Simulate without installing (default: true) |
+
+#### `mainwp_themes_delete`
+Delete a theme from a site (must not be active).
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | Yes | Site ID or domain |
+| `slug` | string | Yes | Theme slug to delete |
+| `dry_run` | boolean | No | Simulate without deleting (default: true) |
+
+---
+
+### Extended Site Management Tools
+
+#### `mainwp_sites_edit`
+Edit site settings in MainWP Dashboard.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | Yes | Site ID or domain |
+| `name` | string | No | New display name |
+| `groupids` | string | No | Comma-separated group IDs |
+| `dry_run` | boolean | No | Simulate without changes (default: true) |
+
+#### `mainwp_sites_suspend`
+Suspend a site (disable monitoring and updates).
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | Yes | Site ID or domain |
+| `dry_run` | boolean | No | Simulate without suspending (default: true) |
+
+#### `mainwp_sites_unsuspend`
+Unsuspend a site (re-enable monitoring and updates).
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | Yes | Site ID or domain |
+| `dry_run` | boolean | No | Simulate without unsuspending (default: true) |
+
+#### `mainwp_sites_changes`
+Get list of changes made outside MainWP (direct WordPress admin changes).
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | Yes | Site ID or domain |
+
+#### `mainwp_sites_remove`
+Permanently remove a site from MainWP Dashboard.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | Yes | Site ID or domain |
+| `confirmed` | boolean | Yes | Must be true to confirm deletion |
+
+---
+
+### Extended Update Management Tools
+
+#### `mainwp_updates_translations`
+Update translations on a site.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | Yes | Site ID or domain |
+| `dry_run` | boolean | No | Simulate without updating (default: true) |
+
+#### `mainwp_updates_ignore`
+Ignore a plugin or theme update (globally or per-site).
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | string | Yes | `plugin` or `theme` |
+| `slug` | string | Yes | Plugin or theme slug |
+| `site` | string | No | Specific site (omit for global) |
+
+#### `mainwp_updates_unignore`
+Stop ignoring a plugin or theme update.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | string | Yes | `plugin` or `theme` |
+| `slug` | string | Yes | Plugin or theme slug |
+| `site` | string | No | Specific site (omit for global) |
+
+#### `mainwp_updates_ignored`
+List all ignored updates.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `site` | string | No | Filter by specific site |
+
+---
+
+### Client Management Tools (Pro)
+
+Requires MainWP Pro with Client Reports extension.
+
+#### `mainwp_clients_list`
+List all clients.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `search` | string | No | Search by name or email |
+| `page` | number | No | Page number |
+| `per_page` | number | No | Results per page |
+
+#### `mainwp_clients_get`
+Get detailed information about a client.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `client` | string | Yes | Client ID or email |
+
+#### `mainwp_clients_add`
+Add a new client.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Client name |
+| `email` | string | Yes | Client email |
+| `company` | string | No | Company name |
+| `phone` | string | No | Phone number |
+| `address` | string | No | Street address |
+| `city` | string | No | City |
+| `state` | string | No | State/Province |
+| `zip` | string | No | ZIP/Postal code |
+| `country` | string | No | Country |
+| `note` | string | No | Internal notes |
+| `selected_sites` | string | No | Comma-separated site IDs |
+
+#### `mainwp_clients_edit`
+Edit a client's information.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `client` | string | Yes | Client ID or email |
+| `dry_run` | boolean | No | Simulate without changes (default: true) |
+| *(all other fields from add)* | | No | Fields to update |
+
+#### `mainwp_clients_delete`
+Delete a client.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `client` | string | Yes | Client ID or email |
+| `confirmed` | boolean | Yes | Must be true to confirm deletion |
+
+---
+
+### Cost Tracking Tools (Pro)
+
+Requires MainWP Pro with Cost Tracker extension.
+
+#### `mainwp_costs_list`
+List all tracked costs.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `search` | string | No | Search by name |
+| `type` | string | No | `single` or `recurring` |
+| `product_type` | string | No | `plugin`, `theme`, `hosting`, `domain`, `service`, `other` |
+| `page` | number | No | Page number |
+| `per_page` | number | No | Results per page |
+
+#### `mainwp_costs_get`
+Get details about a specific cost.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `cost` | string | Yes | Cost ID |
+
+#### `mainwp_costs_add`
+Add a new cost entry.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Cost name/description |
+| `type` | string | No | `single` or `recurring` (default: single) |
+| `product_type` | string | No | Category (default: other) |
+| `price` | number | No | Cost amount |
+| `currency` | string | No | Currency code (default: USD) |
+| `renewal_frequency` | string | No | `monthly`, `yearly`, or `lifetime` |
+| `last_renewal` | string | No | Date (YYYY-MM-DD) |
+| `next_renewal` | string | No | Date (YYYY-MM-DD) |
+| `sites` | string | No | Comma-separated site IDs |
+| `note` | string | No | Additional notes |
+
+#### `mainwp_costs_edit`
+Edit a cost entry.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `cost` | string | Yes | Cost ID |
+| `dry_run` | boolean | No | Simulate without changes (default: true) |
+| *(all other fields from add)* | | No | Fields to update |
+
+#### `mainwp_costs_delete`
+Delete a cost entry.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `cost` | string | Yes | Cost ID |
+| `confirmed` | boolean | Yes | Must be true to confirm deletion |
+
+---
+
+### Tag Management Tools
+
+#### `mainwp_tags_list`
+List all tags/groups defined in MainWP.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `search` | string | No | Filter tags by name |
+
+#### `mainwp_tags_sites`
+Get all sites assigned to a specific tag.
+
+**Parameters:**
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `tag` | string | Yes | Tag ID or name |
 
 ---
 
