@@ -12,7 +12,7 @@ import {
   deletePluginSchema,
 } from '../schemas/tool-schemas.js';
 import { createSuccessResult, createErrorResult } from '../utils/error-handling.js';
-import { createDryRunResult } from '../utils/safety.js';
+import { createDryRunResult, createTestModeResult, isTestMode, resolveDryRun } from '../utils/safety.js';
 
 export function registerPluginTools(server: McpServer): void {
   const client = getMainWPClient();
@@ -45,12 +45,13 @@ export function registerPluginTools(server: McpServer): void {
           return createErrorResult('At least one plugin slug is required');
         }
 
-        if (dry_run) {
-          return createDryRunResult(
-            `Activate plugins on ${site}`,
-            pluginList,
-            { site, action: 'activate' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Activate plugins on ${site}`, pluginList, { site, action: 'activate' })
+            : createDryRunResult(`Activate plugins on ${site}`, pluginList, { site, action: 'activate' });
         }
 
         const result = await client.activatePlugins(site, pluginList);
@@ -78,12 +79,13 @@ export function registerPluginTools(server: McpServer): void {
           return createErrorResult('At least one plugin slug is required');
         }
 
-        if (dry_run) {
-          return createDryRunResult(
-            `Deactivate plugins on ${site}`,
-            pluginList,
-            { site, action: 'deactivate' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Deactivate plugins on ${site}`, pluginList, { site, action: 'deactivate' })
+            : createDryRunResult(`Deactivate plugins on ${site}`, pluginList, { site, action: 'deactivate' });
         }
 
         const result = await client.deactivatePlugins(site, pluginList);
@@ -109,12 +111,13 @@ export function registerPluginTools(server: McpServer): void {
           return createErrorResult('Plugin slug is required');
         }
 
-        if (dry_run) {
-          return createDryRunResult(
-            `Install plugin "${slug}" on ${site}`,
-            [site],
-            { plugin: slug, action: 'install' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Install plugin "${slug}" on ${site}`, [site], { plugin: slug, action: 'install' })
+            : createDryRunResult(`Install plugin "${slug}" on ${site}`, [site], { plugin: slug, action: 'install' });
         }
 
         const result = await client.installPlugin(site, slug);
@@ -140,12 +143,13 @@ export function registerPluginTools(server: McpServer): void {
           return createErrorResult('Plugin slug is required');
         }
 
-        if (dry_run) {
-          return createDryRunResult(
-            `Delete plugin "${slug}" from ${site}`,
-            [site],
-            { plugin: slug, action: 'delete' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Delete plugin "${slug}" from ${site}`, [site], { plugin: slug, action: 'delete' })
+            : createDryRunResult(`Delete plugin "${slug}" from ${site}`, [site], { plugin: slug, action: 'delete' });
         }
 
         const result = await client.deletePlugin(site, slug);

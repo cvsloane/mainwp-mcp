@@ -12,7 +12,7 @@ import {
   deleteClientSchema,
 } from '../schemas/tool-schemas.js';
 import { createSuccessResult, createErrorResult } from '../utils/error-handling.js';
-import { createDryRunResult } from '../utils/safety.js';
+import { createDryRunResult, createTestModeResult, isTestMode, resolveDryRun } from '../utils/safety.js';
 
 export function registerClientTools(server: McpServer): void {
   const client = getMainWPClient();
@@ -39,6 +39,10 @@ export function registerClientTools(server: McpServer): void {
     getClientSchema.shape,
     async ({ client: clientId }) => {
       try {
+        if (isTestMode()) {
+          return createTestModeResult(`Get client ${clientId}`, [clientId], { action: 'get' });
+        }
+
         const result = await client.getClient(clientId);
         return createSuccessResult(result);
       } catch (error) {
@@ -54,6 +58,14 @@ export function registerClientTools(server: McpServer): void {
     addClientSchema.shape,
     async ({ name, email, company, phone, address, city, state, zip, country, note, selected_sites }) => {
       try {
+        if (isTestMode()) {
+          return createTestModeResult(
+            `Add client ${name}`,
+            [email],
+            { name, email, company, phone, address, city, state, zip, country, note, selected_sites }
+          );
+        }
+
         const result = await client.addClient({
           name,
           email,
@@ -84,12 +96,13 @@ export function registerClientTools(server: McpServer): void {
     editClientSchema.shape,
     async ({ client: clientId, dry_run, ...updateData }) => {
       try {
-        if (dry_run) {
-          return createDryRunResult(
-            `Edit client ${clientId}`,
-            [clientId],
-            { updates: updateData }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Edit client ${clientId}`, [clientId], { updates: updateData })
+            : createDryRunResult(`Edit client ${clientId}`, [clientId], { updates: updateData });
         }
 
         const result = await client.editClient(clientId, updateData);
@@ -114,6 +127,10 @@ export function registerClientTools(server: McpServer): void {
           return createErrorResult(
             `Deleting client ${clientId} requires confirmation. Set confirmed=true to proceed. This action cannot be undone.`
           );
+        }
+
+        if (isTestMode()) {
+          return createTestModeResult(`Delete client ${clientId}`, [clientId], { action: 'delete' });
         }
 
         const result = await client.deleteClient(clientId);

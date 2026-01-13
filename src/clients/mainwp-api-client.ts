@@ -2,7 +2,7 @@
  * MainWP REST API Client
  */
 
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosResponse } from 'axios';
 import type { MainWPClientConfig, MainWPApiResponse } from '../types/mainwp-types.js';
 
 export class MainWPApiClient {
@@ -24,7 +24,10 @@ export class MainWPApiClient {
 
     // Response interceptor for error handling
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        this.ensureJsonResponse(response);
+        return response;
+      },
       (error: AxiosError) => {
         return Promise.reject(this.handleApiError(error));
       }
@@ -59,11 +62,42 @@ export class MainWPApiClient {
     if (error.response) {
       const data = error.response.data as { error?: string; message?: string };
       const message = data?.error || data?.message || error.message;
-      return new Error(`MainWP API Error (${error.response.status}): ${message}`);
+      const err = new Error(`MainWP API Error (${error.response.status}): ${message}`) as Error & { status?: number };
+      err.status = error.response.status;
+      return err;
     } else if (error.request) {
-      return new Error(`MainWP API Error: No response received - ${error.message}`);
+      const err = new Error(`MainWP API Error: No response received - ${error.message}`) as Error & { status?: number };
+      return err;
     } else {
-      return new Error(`MainWP API Error: ${error.message}`);
+      const err = new Error(`MainWP API Error: ${error.message}`) as Error & { status?: number };
+      return err;
+    }
+  }
+
+  /**
+   * Ensure responses are JSON (or JSON-like). Convert JSON strings or throw on HTML errors.
+   */
+  private ensureJsonResponse(response: AxiosResponse): void {
+    const data = response.data;
+    if (typeof data !== 'string') {
+      return;
+    }
+
+    const trimmed = data.trim();
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      try {
+        response.data = JSON.parse(trimmed);
+        return;
+      } catch {
+        // fall through to HTML detection
+      }
+    }
+
+    const looksLikeHtml = /<\s*(!doctype|html|body|div|p|br|head|title)/i.test(trimmed);
+    const looksLikeWpDbError = /WordPress database error|wpdberror/i.test(trimmed);
+    if (looksLikeHtml || looksLikeWpDbError) {
+      const snippet = trimmed.slice(0, 240).replace(/\s+/g, ' ');
+      throw new Error(`MainWP API Error: HTML response returned instead of JSON. Snippet: ${snippet}`);
     }
   }
 
@@ -372,8 +406,8 @@ export class MainWPApiClient {
   /**
    * List ignored updates
    */
-  async listIgnoredUpdates(): Promise<MainWPApiResponse<unknown>> {
-    return this.get('/updates/ignored');
+  async listIgnoredUpdates(params?: { site?: string }): Promise<MainWPApiResponse<unknown>> {
+    return this.get('/updates/ignored', params);
   }
 
   // ============ Clients API (Pro) ============
@@ -480,7 +514,14 @@ export class MainWPApiClient {
     sites?: string;
     note?: string;
   }): Promise<MainWPApiResponse<unknown>> {
-    return this.put('/costs/add', data);
+    try {
+      return await this.post('/costs/add', data);
+    } catch (error) {
+      if (this.shouldFallbackToPut(error)) {
+        return this.put('/costs/add', data);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -522,6 +563,19 @@ export class MainWPApiClient {
    */
   async getTagSites(tagId: string): Promise<MainWPApiResponse<unknown>> {
     return this.get(`/tags/${tagId}/sites`);
+  }
+
+  /**
+   * Determine whether to fallback to PUT for endpoints that may be method-sensitive.
+   */
+  private shouldFallbackToPut(error: unknown): boolean {
+    const err = error as Error & { status?: number };
+    if (err?.status && (err.status === 404 || err.status === 405)) {
+      return true;
+    }
+
+    const message = err?.message?.toLowerCase?.() ?? '';
+    return message.includes('(404)') || message.includes('(405)') || message.includes('not found') || message.includes('method not allowed');
   }
 }
 

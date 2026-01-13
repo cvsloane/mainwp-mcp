@@ -9,8 +9,8 @@ export const siteIdentifierSchema = z.string().describe(
   'Site ID (number) or domain name (e.g., "1" or "pavinglist.com")'
 );
 
-export const dryRunSchema = z.boolean().default(true).describe(
-  'Simulate the operation without making changes (default: true)'
+export const dryRunSchema = z.boolean().optional().describe(
+  'Simulate the operation without making changes (defaults to MAINWP_ENABLE_DRY_RUN_BY_DEFAULT)'
 );
 
 export const confirmedSchema = z.boolean().default(false).describe(

@@ -13,7 +13,7 @@ import {
   listIgnoredUpdatesSchema,
 } from '../schemas/tool-schemas.js';
 import { createSuccessResult, createErrorResult } from '../utils/error-handling.js';
-import { createDryRunResult, isDryRunDefault } from '../utils/safety.js';
+import { createDryRunResult, createTestModeResult, isTestMode, resolveDryRun } from '../utils/safety.js';
 
 export function registerUpdateTools(server: McpServer): void {
   const client = getMainWPClient();
@@ -45,6 +45,8 @@ export function registerUpdateTools(server: McpServer): void {
     applyUpdatesSchema.shape,
     async ({ site, type, items, dry_run }) => {
       try {
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
         // Parse items if provided
         const itemList = items ? items.split(',').map(s => s.trim()).filter(Boolean) : undefined;
 
@@ -54,19 +56,19 @@ export function registerUpdateTools(server: McpServer): void {
           : `all ${type} updates`;
 
         // Handle dry-run mode
-        if (dry_run) {
+        if (effectiveDryRun) {
           // Fetch current updates to show what would be applied
           const updates = await client.getSiteUpdates(site);
 
-          return createDryRunResult(
-            `Apply ${updateDescription} on ${site}`,
-            [site],
-            {
-              type,
-              items: itemList || 'all',
-              current_updates: updates,
-            }
-          );
+          const details = {
+            type,
+            items: itemList || 'all',
+            current_updates: updates,
+          };
+
+          return testMode
+            ? createTestModeResult(`Apply ${updateDescription} on ${site}`, [site], details)
+            : createDryRunResult(`Apply ${updateDescription} on ${site}`, [site], details);
         }
 
         // Execute the actual updates
@@ -114,13 +116,15 @@ export function registerUpdateTools(server: McpServer): void {
     },
     async ({ site, dry_run }) => {
       try {
-        if (dry_run) {
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
           const updates = await client.getSiteUpdates(site);
-          return createDryRunResult(
-            `Update WordPress core on ${site}`,
-            [site],
-            { current_updates: updates }
-          );
+          const details = { current_updates: updates };
+          return testMode
+            ? createTestModeResult(`Update WordPress core on ${site}`, [site], details)
+            : createDryRunResult(`Update WordPress core on ${site}`, [site], details);
         }
 
         const result = await client.updateWordPress(site);
@@ -147,17 +151,18 @@ export function registerUpdateTools(server: McpServer): void {
       try {
         const pluginList = plugins ? plugins.split(',').map(s => s.trim()).filter(Boolean) : undefined;
         const target = pluginList ? pluginList.join(', ') : 'all plugins';
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
 
-        if (dry_run) {
+        if (effectiveDryRun) {
           const updates = await client.getSiteUpdates(site);
-          return createDryRunResult(
-            `Update ${target} on ${site}`,
-            [site],
-            {
-              plugins: pluginList || 'all',
-              current_updates: updates,
-            }
-          );
+          const details = {
+            plugins: pluginList || 'all',
+            current_updates: updates,
+          };
+          return testMode
+            ? createTestModeResult(`Update ${target} on ${site}`, [site], details)
+            : createDryRunResult(`Update ${target} on ${site}`, [site], details);
         }
 
         const result = await client.updatePlugins(site, pluginList);
@@ -184,17 +189,18 @@ export function registerUpdateTools(server: McpServer): void {
       try {
         const themeList = themes ? themes.split(',').map(s => s.trim()).filter(Boolean) : undefined;
         const target = themeList ? themeList.join(', ') : 'all themes';
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
 
-        if (dry_run) {
+        if (effectiveDryRun) {
           const updates = await client.getSiteUpdates(site);
-          return createDryRunResult(
-            `Update ${target} on ${site}`,
-            [site],
-            {
-              themes: themeList || 'all',
-              current_updates: updates,
-            }
-          );
+          const details = {
+            themes: themeList || 'all',
+            current_updates: updates,
+          };
+          return testMode
+            ? createTestModeResult(`Update ${target} on ${site}`, [site], details)
+            : createDryRunResult(`Update ${target} on ${site}`, [site], details);
         }
 
         const result = await client.updateThemes(site, themeList);
@@ -215,13 +221,15 @@ export function registerUpdateTools(server: McpServer): void {
     updateTranslationsSchema.shape,
     async ({ site, dry_run }) => {
       try {
-        if (dry_run) {
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
           const updates = await client.getSiteUpdates(site);
-          return createDryRunResult(
-            `Update translations on ${site}`,
-            [site],
-            { current_updates: updates }
-          );
+          const details = { current_updates: updates };
+          return testMode
+            ? createTestModeResult(`Update translations on ${site}`, [site], details)
+            : createDryRunResult(`Update translations on ${site}`, [site], details);
         }
 
         const result = await client.updateTranslations(site);
@@ -244,6 +252,14 @@ export function registerUpdateTools(server: McpServer): void {
       try {
         if (!slug || slug.trim() === '') {
           return createErrorResult(`${type} slug is required`);
+        }
+
+        if (isTestMode()) {
+          return createTestModeResult(
+            `Ignore ${type} "${slug}" updates`,
+            site ? [site] : ['global'],
+            { type, slug, site }
+          );
         }
 
         const result = await client.ignoreUpdate({ type, slug, site });
@@ -269,6 +285,14 @@ export function registerUpdateTools(server: McpServer): void {
           return createErrorResult(`${type} slug is required`);
         }
 
+        if (isTestMode()) {
+          return createTestModeResult(
+            `Unignore ${type} "${slug}" updates`,
+            site ? [site] : ['global'],
+            { type, slug, site }
+          );
+        }
+
         const result = await client.unignoreUpdate({ type, slug, site });
         const scope = site ? `on ${site}` : 'globally';
         return createSuccessResult({
@@ -288,7 +312,7 @@ export function registerUpdateTools(server: McpServer): void {
     listIgnoredUpdatesSchema.shape,
     async ({ site }) => {
       try {
-        const result = await client.listIgnoredUpdates();
+        const result = await client.listIgnoredUpdates(site ? { site } : undefined);
         return createSuccessResult({
           filter: site ? { site } : 'all',
           ...result,

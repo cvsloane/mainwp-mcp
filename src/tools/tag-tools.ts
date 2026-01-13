@@ -33,7 +33,40 @@ export function registerTagTools(server: McpServer): void {
 
         return createSuccessResult(result);
       } catch (error) {
-        return createErrorResult('Failed to list tags', error);
+        // Fallback: derive tags from site list if tags endpoint fails
+        try {
+          const sitesResult = await client.listSites();
+          const sites = (sitesResult as { data?: Array<{ tags?: Record<string, string> }> }).data ?? [];
+          const tagMap = new Map<string, { id: string; name: string; site_count: number }>();
+
+          for (const site of sites) {
+            const tags = site.tags ?? {};
+            for (const [id, name] of Object.entries(tags)) {
+              const existing = tagMap.get(id);
+              if (existing) {
+                existing.site_count += 1;
+              } else {
+                tagMap.set(id, { id, name, site_count: 1 });
+              }
+            }
+          }
+
+          let data = Array.from(tagMap.values());
+          if (search) {
+            const searchLower = search.toLowerCase();
+            data = data.filter(tag => tag.name.toLowerCase().includes(searchLower));
+          }
+
+          return createSuccessResult({
+            success: 1,
+            total: data.length,
+            data,
+            warning: 'Tags endpoint failed; tags derived from sites list.',
+            source: 'sites_list',
+          });
+        } catch (fallbackError) {
+          return createErrorResult('Failed to list tags', fallbackError);
+        }
       }
     }
   );
@@ -51,7 +84,31 @@ export function registerTagTools(server: McpServer): void {
           ...result,
         });
       } catch (error) {
-        return createErrorResult(`Failed to get sites for tag ${tag}`, error);
+        // Fallback: derive from site list if tags endpoint fails
+        try {
+          const sitesResult = await client.listSites();
+          const sites = (sitesResult as { data?: Array<{ id: string; name: string; url: string; tags?: Record<string, string> }> }).data ?? [];
+          const tagLower = tag.toLowerCase();
+          const matching = sites.filter(site => {
+            const tags = site.tags ?? {};
+            return Object.entries(tags).some(([id, name]) => id === tag || name.toLowerCase() === tagLower);
+          });
+
+          return createSuccessResult({
+            tag,
+            success: 1,
+            total: matching.length,
+            data: matching.map(site => ({
+              id: site.id,
+              name: site.name,
+              url: site.url,
+            })),
+            warning: 'Tag sites endpoint failed; results derived from sites list.',
+            source: 'sites_list',
+          });
+        } catch (fallbackError) {
+          return createErrorResult(`Failed to get sites for tag ${tag}`, fallbackError);
+        }
       }
     }
   );

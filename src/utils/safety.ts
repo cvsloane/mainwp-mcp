@@ -12,6 +12,21 @@ export function isDryRunDefault(): boolean {
 }
 
 /**
+ * Resolve the effective dry-run value for a tool invocation.
+ * If the caller does not provide dry_run, fall back to env default.
+ */
+export function resolveDryRun(dryRun?: boolean): boolean {
+  return typeof dryRun === 'boolean' ? dryRun : isDryRunDefault();
+}
+
+/**
+ * Check if test mode is enabled (no side effects)
+ */
+export function isTestMode(): boolean {
+  return process.env.MAINWP_TEST_MODE === 'true';
+}
+
+/**
  * Check if bulk operations require confirmation
  */
 export function requiresBulkConfirmation(): boolean {
@@ -38,6 +53,35 @@ export function createDryRunResult(
   }
 
   message.push('', 'To execute this operation, set dry_run=false');
+
+  return {
+    content: [{
+      type: 'text',
+      text: message.join('\n'),
+    }],
+  };
+}
+
+/**
+ * Create a test-mode result showing what would happen without side effects
+ */
+export function createTestModeResult(
+  operation: string,
+  targets: string[],
+  details?: Record<string, unknown>
+): ToolResult {
+  const message = [
+    `TEST MODE - ${operation}`,
+    '',
+    `Would affect ${targets.length} target(s):`,
+    ...targets.map(t => `  - ${t}`),
+  ];
+
+  if (details) {
+    message.push('', 'Details:', JSON.stringify(details, null, 2));
+  }
+
+  message.push('', 'No API call was made. Disable MAINWP_TEST_MODE to execute.');
 
   return {
     content: [{

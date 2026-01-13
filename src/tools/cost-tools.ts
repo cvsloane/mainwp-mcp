@@ -12,7 +12,7 @@ import {
   deleteCostSchema,
 } from '../schemas/tool-schemas.js';
 import { createSuccessResult, createErrorResult } from '../utils/error-handling.js';
-import { createDryRunResult } from '../utils/safety.js';
+import { createDryRunResult, createTestModeResult, isTestMode, resolveDryRun } from '../utils/safety.js';
 
 export function registerCostTools(server: McpServer): void {
   const client = getMainWPClient();
@@ -39,6 +39,10 @@ export function registerCostTools(server: McpServer): void {
     getCostSchema.shape,
     async ({ cost }) => {
       try {
+        if (isTestMode()) {
+          return createTestModeResult(`Get cost ${cost}`, [cost], { action: 'get' });
+        }
+
         const result = await client.getCost(cost);
         return createSuccessResult(result);
       } catch (error) {
@@ -54,6 +58,14 @@ export function registerCostTools(server: McpServer): void {
     addCostSchema.shape,
     async ({ name, type, product_type, price, currency, renewal_frequency, last_renewal, next_renewal, sites, note }) => {
       try {
+        if (isTestMode()) {
+          return createTestModeResult(
+            `Add cost ${name}`,
+            [name],
+            { name, type, product_type, price, currency, renewal_frequency, last_renewal, next_renewal, sites, note }
+          );
+        }
+
         const result = await client.addCost({
           name,
           type,
@@ -83,12 +95,13 @@ export function registerCostTools(server: McpServer): void {
     editCostSchema.shape,
     async ({ cost, dry_run, ...updateData }) => {
       try {
-        if (dry_run) {
-          return createDryRunResult(
-            `Edit cost ${cost}`,
-            [cost],
-            { updates: updateData }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Edit cost ${cost}`, [cost], { updates: updateData })
+            : createDryRunResult(`Edit cost ${cost}`, [cost], { updates: updateData });
         }
 
         const result = await client.editCost(cost, updateData);
@@ -113,6 +126,10 @@ export function registerCostTools(server: McpServer): void {
           return createErrorResult(
             `Deleting cost ${cost} requires confirmation. Set confirmed=true to proceed. This action cannot be undone.`
           );
+        }
+
+        if (isTestMode()) {
+          return createTestModeResult(`Delete cost ${cost}`, [cost], { action: 'delete' });
         }
 
         const result = await client.deleteCost(cost);

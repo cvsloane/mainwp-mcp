@@ -258,6 +258,9 @@ MAINWP_ENABLE_DRY_RUN_BY_DEFAULT=true
 # Require explicit confirmation for bulk operations (recommended: true)
 MAINWP_REQUIRE_CONFIRMATION_BULK=true
 
+# Optional: Test mode (no side effects)
+MAINWP_TEST_MODE=false
+
 # Rate limit: maximum API requests per minute (default: 60)
 MAINWP_RATE_LIMIT_PER_MINUTE=60
 ```
@@ -270,6 +273,7 @@ MAINWP_RATE_LIMIT_PER_MINUTE=60
 | `MAINWP_API_KEY` | Yes | - | API credentials in `key==secret` format |
 | `MAINWP_ENABLE_DRY_RUN_BY_DEFAULT` | No | `true` | Simulate operations by default |
 | `MAINWP_REQUIRE_CONFIRMATION_BULK` | No | `true` | Require confirmation for multi-site ops |
+| `MAINWP_TEST_MODE` | No | `false` | Simulate mutating operations without side effects |
 | `MAINWP_RATE_LIMIT_PER_MINUTE` | No | `60` | Max API requests per minute |
 
 ---
@@ -295,6 +299,7 @@ Add to your Claude Code MCP configuration file:
         "MAINWP_API_KEY": "your_consumer_key==your_consumer_secret",
         "MAINWP_ENABLE_DRY_RUN_BY_DEFAULT": "true",
         "MAINWP_REQUIRE_CONFIRMATION_BULK": "true",
+        "MAINWP_TEST_MODE": "false",
         "MAINWP_RATE_LIMIT_PER_MINUTE": "60"
       }
     }
@@ -939,12 +944,22 @@ Claude: "This would update plugins on 15 sites. Please confirm you want to proce
 MAINWP_REQUIRE_CONFIRMATION_BULK=false
 ```
 
+### Test Mode (No Side Effects)
+
+For smoke testing or demos, you can enable test mode to prevent any changes while still exercising tool paths:
+
+```bash
+MAINWP_TEST_MODE=true
+```
+
+When enabled, mutating tools return simulated results and make no API calls.
+
 ### Rate Limiting
 
 The server enforces rate limiting to prevent overwhelming your MainWP Dashboard:
 
 - Default: 60 requests per minute
-- Requests exceeding the limit are queued
+- Requests exceeding the limit return an error with a retry delay
 - Prevents accidental DoS of your own infrastructure
 
 **To adjust the rate limit**:
@@ -1078,6 +1093,9 @@ npm run clean
 # Test API connection manually
 curl -H "Authorization: Bearer YOUR_KEY==YOUR_SECRET" \
   https://your-dashboard.com/wp-json/mainwp/v2/sites
+
+# Run a safe smoke test of all tools (test mode, no side effects)
+npm run smoke-test
 
 # Run the server and test with Claude Code
 npm start

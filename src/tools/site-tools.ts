@@ -17,7 +17,7 @@ import {
   removeSiteSchema,
 } from '../schemas/tool-schemas.js';
 import { createSuccessResult, createErrorResult } from '../utils/error-handling.js';
-import { checkBulkOperation, createDryRunResult } from '../utils/safety.js';
+import { checkBulkOperation, createDryRunResult, createTestModeResult, isTestMode, resolveDryRun } from '../utils/safety.js';
 
 export function registerSiteTools(server: McpServer): void {
   const client = getMainWPClient();
@@ -61,8 +61,13 @@ export function registerSiteTools(server: McpServer): void {
     syncSiteSchema.shape,
     async ({ site, confirmed }) => {
       try {
+        const testMode = isTestMode();
         if (site) {
           // Sync single site
+          if (testMode) {
+            return createTestModeResult(`Sync site ${site}`, [site], { action: 'sync' });
+          }
+
           const result = await client.syncSite(site);
           return createSuccessResult({
             message: `Successfully synced site: ${site}`,
@@ -70,9 +75,36 @@ export function registerSiteTools(server: McpServer): void {
           });
         } else {
           // Sync all sites - requires confirmation
-          const bulkCheck = checkBulkOperation(999, confirmed);
+          let targetCount = 999;
+          try {
+            const countResult = await client.getSitesCount();
+            const countValue =
+              typeof (countResult as { count?: number }).count === 'number'
+                ? (countResult as { count?: number }).count
+                : typeof (countResult as { data?: { count?: number } }).data?.count === 'number'
+                  ? (countResult as { data?: { count?: number } }).data?.count
+                  : undefined;
+
+            if (typeof countValue === 'number') {
+              targetCount = countValue;
+            } else {
+              const sitesResult = await client.listSitesBasic();
+              const sites = (sitesResult as { data?: unknown[] }).data;
+              if (Array.isArray(sites)) {
+                targetCount = sites.length;
+              }
+            }
+          } catch {
+            // fall back to default when count lookup fails
+          }
+
+          const bulkCheck = checkBulkOperation(targetCount, confirmed);
           if (!bulkCheck.allowed) {
             return createErrorResult(bulkCheck.message ?? 'Bulk operation not allowed');
+          }
+
+          if (testMode) {
+            return createTestModeResult('Sync all sites', ['all'], { action: 'sync', target_count: targetCount });
           }
 
           const result = await client.syncAllSites();
@@ -127,6 +159,14 @@ export function registerSiteTools(server: McpServer): void {
     addSiteSchema.shape,
     async ({ url, name, admin, uniqueId, ssl_verify, groupids }) => {
       try {
+        if (isTestMode()) {
+          return createTestModeResult(
+            `Add site ${url}`,
+            [url],
+            { url, name, admin, uniqueId, ssl_verify, groupids }
+          );
+        }
+
         const result = await client.addSite({
           url,
           name,
@@ -152,6 +192,10 @@ export function registerSiteTools(server: McpServer): void {
     getSiteSchema.shape,
     async ({ site }) => {
       try {
+        if (isTestMode()) {
+          return createTestModeResult(`Reconnect site ${site}`, [site], { action: 'reconnect' });
+        }
+
         const result = await client.reconnectSite(site);
         return createSuccessResult({
           message: `Successfully reconnected to site: ${site}`,
@@ -170,6 +214,10 @@ export function registerSiteTools(server: McpServer): void {
     getSiteSchema.shape,
     async ({ site }) => {
       try {
+        if (isTestMode()) {
+          return createTestModeResult(`Disconnect site ${site}`, [site], { action: 'disconnect' });
+        }
+
         const result = await client.disconnectSite(site);
         return createSuccessResult({
           message: `Successfully disconnected site: ${site}`,
@@ -196,12 +244,13 @@ export function registerSiteTools(server: McpServer): void {
           return createErrorResult('At least one field (name or groupids) must be provided');
         }
 
-        if (dry_run) {
-          return createDryRunResult(
-            `Edit site ${site}`,
-            [site],
-            { updates }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Edit site ${site}`, [site], { updates })
+            : createDryRunResult(`Edit site ${site}`, [site], { updates });
         }
 
         const result = await client.editSite(site, updates);
@@ -222,12 +271,13 @@ export function registerSiteTools(server: McpServer): void {
     suspendSiteSchema.shape,
     async ({ site, dry_run }) => {
       try {
-        if (dry_run) {
-          return createDryRunResult(
-            `Suspend site ${site}`,
-            [site],
-            { action: 'suspend' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Suspend site ${site}`, [site], { action: 'suspend' })
+            : createDryRunResult(`Suspend site ${site}`, [site], { action: 'suspend' });
         }
 
         const result = await client.suspendSite(site);
@@ -248,12 +298,13 @@ export function registerSiteTools(server: McpServer): void {
     unsuspendSiteSchema.shape,
     async ({ site, dry_run }) => {
       try {
-        if (dry_run) {
-          return createDryRunResult(
-            `Unsuspend site ${site}`,
-            [site],
-            { action: 'unsuspend' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Unsuspend site ${site}`, [site], { action: 'unsuspend' })
+            : createDryRunResult(`Unsuspend site ${site}`, [site], { action: 'unsuspend' });
         }
 
         const result = await client.unsuspendSite(site);
@@ -296,6 +347,10 @@ export function registerSiteTools(server: McpServer): void {
           return createErrorResult(
             `Removing site ${site} requires confirmation. Set confirmed=true to proceed. This permanently deletes all site data from MainWP.`
           );
+        }
+
+        if (isTestMode()) {
+          return createTestModeResult(`Remove site ${site}`, [site], { action: 'remove' });
         }
 
         const result = await client.removeSite(site);

@@ -11,7 +11,7 @@ import {
   deleteThemeSchema,
 } from '../schemas/tool-schemas.js';
 import { createSuccessResult, createErrorResult } from '../utils/error-handling.js';
-import { createDryRunResult } from '../utils/safety.js';
+import { createDryRunResult, createTestModeResult, isTestMode, resolveDryRun } from '../utils/safety.js';
 
 export function registerThemeTools(server: McpServer): void {
   const client = getMainWPClient();
@@ -42,12 +42,13 @@ export function registerThemeTools(server: McpServer): void {
           return createErrorResult('Theme slug is required');
         }
 
-        if (dry_run) {
-          return createDryRunResult(
-            `Activate theme "${theme}" on ${site}`,
-            [site],
-            { theme, action: 'activate' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Activate theme "${theme}" on ${site}`, [site], { theme, action: 'activate' })
+            : createDryRunResult(`Activate theme "${theme}" on ${site}`, [site], { theme, action: 'activate' });
         }
 
         const result = await client.activateTheme(site, theme);
@@ -73,12 +74,13 @@ export function registerThemeTools(server: McpServer): void {
           return createErrorResult('Theme slug is required');
         }
 
-        if (dry_run) {
-          return createDryRunResult(
-            `Install theme "${slug}" on ${site}`,
-            [site],
-            { theme: slug, action: 'install' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Install theme "${slug}" on ${site}`, [site], { theme: slug, action: 'install' })
+            : createDryRunResult(`Install theme "${slug}" on ${site}`, [site], { theme: slug, action: 'install' });
         }
 
         const result = await client.installTheme(site, slug);
@@ -104,12 +106,13 @@ export function registerThemeTools(server: McpServer): void {
           return createErrorResult('Theme slug is required');
         }
 
-        if (dry_run) {
-          return createDryRunResult(
-            `Delete theme "${slug}" from ${site}`,
-            [site],
-            { theme: slug, action: 'delete' }
-          );
+        const testMode = isTestMode();
+        const effectiveDryRun = testMode ? true : resolveDryRun(dry_run);
+
+        if (effectiveDryRun) {
+          return testMode
+            ? createTestModeResult(`Delete theme "${slug}" from ${site}`, [site], { theme: slug, action: 'delete' })
+            : createDryRunResult(`Delete theme "${slug}" from ${site}`, [site], { theme: slug, action: 'delete' });
         }
 
         const result = await client.deleteTheme(site, slug);
