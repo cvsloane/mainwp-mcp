@@ -9,6 +9,9 @@ import {
   registerUpdateTools,
   registerPluginTools,
   registerThemeTools,
+  registerClientTools,
+  registerCostTools,
+  registerTagTools,
 } from './tools/index.js';
 
 const SERVER_NAME = 'mainwp-mcp';
@@ -25,6 +28,9 @@ export async function createServer(): Promise<McpServer> {
   registerUpdateTools(server);
   registerPluginTools(server);
   registerThemeTools(server);
+  registerClientTools(server);
+  registerCostTools(server);
+  registerTagTools(server);
 
   return server;
 }

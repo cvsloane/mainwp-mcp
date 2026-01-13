@@ -4,7 +4,14 @@
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { getMainWPClient } from '../clients/mainwp-api-client.js';
-import { listUpdatesSchema, applyUpdatesSchema } from '../schemas/tool-schemas.js';
+import {
+  listUpdatesSchema,
+  applyUpdatesSchema,
+  updateTranslationsSchema,
+  ignoreUpdateSchema,
+  unignoreUpdateSchema,
+  listIgnoredUpdatesSchema,
+} from '../schemas/tool-schemas.js';
 import { createSuccessResult, createErrorResult } from '../utils/error-handling.js';
 import { createDryRunResult, isDryRunDefault } from '../utils/safety.js';
 
@@ -197,6 +204,97 @@ export function registerUpdateTools(server: McpServer): void {
         });
       } catch (error) {
         return createErrorResult(`Failed to update themes on ${site}`, error);
+      }
+    }
+  );
+
+  // Update translations
+  server.tool(
+    'mainwp_updates_translations',
+    'Update translations on a WordPress site',
+    updateTranslationsSchema.shape,
+    async ({ site, dry_run }) => {
+      try {
+        if (dry_run) {
+          const updates = await client.getSiteUpdates(site);
+          return createDryRunResult(
+            `Update translations on ${site}`,
+            [site],
+            { current_updates: updates }
+          );
+        }
+
+        const result = await client.updateTranslations(site);
+        return createSuccessResult({
+          message: `Successfully updated translations on ${site}`,
+          result,
+        });
+      } catch (error) {
+        return createErrorResult(`Failed to update translations on ${site}`, error);
+      }
+    }
+  );
+
+  // Ignore an update
+  server.tool(
+    'mainwp_updates_ignore',
+    'Ignore a plugin or theme update (globally or for a specific site)',
+    ignoreUpdateSchema.shape,
+    async ({ type, slug, site }) => {
+      try {
+        if (!slug || slug.trim() === '') {
+          return createErrorResult(`${type} slug is required`);
+        }
+
+        const result = await client.ignoreUpdate({ type, slug, site });
+        const scope = site ? `on ${site}` : 'globally';
+        return createSuccessResult({
+          message: `Successfully ignored ${type} "${slug}" updates ${scope}`,
+          result,
+        });
+      } catch (error) {
+        return createErrorResult(`Failed to ignore ${type} "${slug}" update`, error);
+      }
+    }
+  );
+
+  // Unignore an update
+  server.tool(
+    'mainwp_updates_unignore',
+    'Stop ignoring a plugin or theme update',
+    unignoreUpdateSchema.shape,
+    async ({ type, slug, site }) => {
+      try {
+        if (!slug || slug.trim() === '') {
+          return createErrorResult(`${type} slug is required`);
+        }
+
+        const result = await client.unignoreUpdate({ type, slug, site });
+        const scope = site ? `on ${site}` : 'globally';
+        return createSuccessResult({
+          message: `Successfully unignored ${type} "${slug}" updates ${scope}`,
+          result,
+        });
+      } catch (error) {
+        return createErrorResult(`Failed to unignore ${type} "${slug}" update`, error);
+      }
+    }
+  );
+
+  // List ignored updates
+  server.tool(
+    'mainwp_updates_ignored',
+    'List all ignored plugin and theme updates',
+    listIgnoredUpdatesSchema.shape,
+    async ({ site }) => {
+      try {
+        const result = await client.listIgnoredUpdates();
+        return createSuccessResult({
+          filter: site ? { site } : 'all',
+          ...result,
+        });
+      } catch (error) {
+        return createErrorResult('Failed to list ignored updates', error);
       }
     }
   );

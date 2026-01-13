@@ -10,9 +10,14 @@ import {
   syncSiteSchema,
   checkSiteSchema,
   addSiteSchema,
+  editSiteSchema,
+  suspendSiteSchema,
+  unsuspendSiteSchema,
+  nonMainWPChangesSchema,
+  removeSiteSchema,
 } from '../schemas/tool-schemas.js';
 import { createSuccessResult, createErrorResult } from '../utils/error-handling.js';
-import { checkBulkOperation } from '../utils/safety.js';
+import { checkBulkOperation, createDryRunResult } from '../utils/safety.js';
 
 export function registerSiteTools(server: McpServer): void {
   const client = getMainWPClient();
@@ -172,6 +177,134 @@ export function registerSiteTools(server: McpServer): void {
         });
       } catch (error) {
         return createErrorResult(`Failed to disconnect site ${site}`, error);
+      }
+    }
+  );
+
+  // Edit site
+  server.tool(
+    'mainwp_sites_edit',
+    'Edit site settings (name, groups) in MainWP Dashboard',
+    editSiteSchema.shape,
+    async ({ site, name, groupids, dry_run }) => {
+      try {
+        const updates: Record<string, string | undefined> = {};
+        if (name) updates.name = name;
+        if (groupids) updates.groupids = groupids;
+
+        if (Object.keys(updates).length === 0) {
+          return createErrorResult('At least one field (name or groupids) must be provided');
+        }
+
+        if (dry_run) {
+          return createDryRunResult(
+            `Edit site ${site}`,
+            [site],
+            { updates }
+          );
+        }
+
+        const result = await client.editSite(site, updates);
+        return createSuccessResult({
+          message: `Successfully updated site: ${site}`,
+          result,
+        });
+      } catch (error) {
+        return createErrorResult(`Failed to edit site ${site}`, error);
+      }
+    }
+  );
+
+  // Suspend site
+  server.tool(
+    'mainwp_sites_suspend',
+    'Suspend a WordPress site (temporarily disable monitoring and updates)',
+    suspendSiteSchema.shape,
+    async ({ site, dry_run }) => {
+      try {
+        if (dry_run) {
+          return createDryRunResult(
+            `Suspend site ${site}`,
+            [site],
+            { action: 'suspend' }
+          );
+        }
+
+        const result = await client.suspendSite(site);
+        return createSuccessResult({
+          message: `Successfully suspended site: ${site}`,
+          result,
+        });
+      } catch (error) {
+        return createErrorResult(`Failed to suspend site ${site}`, error);
+      }
+    }
+  );
+
+  // Unsuspend site
+  server.tool(
+    'mainwp_sites_unsuspend',
+    'Unsuspend a WordPress site (re-enable monitoring and updates)',
+    unsuspendSiteSchema.shape,
+    async ({ site, dry_run }) => {
+      try {
+        if (dry_run) {
+          return createDryRunResult(
+            `Unsuspend site ${site}`,
+            [site],
+            { action: 'unsuspend' }
+          );
+        }
+
+        const result = await client.unsuspendSite(site);
+        return createSuccessResult({
+          message: `Successfully unsuspended site: ${site}`,
+          result,
+        });
+      } catch (error) {
+        return createErrorResult(`Failed to unsuspend site ${site}`, error);
+      }
+    }
+  );
+
+  // Get non-MainWP changes
+  server.tool(
+    'mainwp_sites_changes',
+    'Get list of changes made outside MainWP (direct WordPress admin changes)',
+    nonMainWPChangesSchema.shape,
+    async ({ site }) => {
+      try {
+        const result = await client.getNonMainWPChanges(site);
+        return createSuccessResult({
+          site,
+          ...result,
+        });
+      } catch (error) {
+        return createErrorResult(`Failed to get non-MainWP changes for ${site}`, error);
+      }
+    }
+  );
+
+  // Remove site (permanent deletion)
+  server.tool(
+    'mainwp_sites_remove',
+    'Permanently remove a site from MainWP Dashboard (requires confirmation)',
+    removeSiteSchema.shape,
+    async ({ site, confirmed }) => {
+      try {
+        if (!confirmed) {
+          return createErrorResult(
+            `Removing site ${site} requires confirmation. Set confirmed=true to proceed. This permanently deletes all site data from MainWP.`
+          );
+        }
+
+        const result = await client.removeSite(site);
+        return createSuccessResult({
+          message: `Successfully removed site: ${site}`,
+          result,
+        });
+      } catch (error) {
+        return createErrorResult(`Failed to remove site ${site}`, error);
       }
     }
   );

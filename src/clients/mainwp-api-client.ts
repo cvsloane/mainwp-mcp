@@ -94,6 +94,15 @@ export class MainWPApiClient {
     return response.data;
   }
 
+  /**
+   * Make a PUT request
+   */
+  async put<T>(endpoint: string, data?: Record<string, unknown>): Promise<T> {
+    await this.checkRateLimit();
+    const response = await this.client.put<T>(endpoint, data);
+    return response.data;
+  }
+
   // ============ Sites API ============
 
   /**
@@ -173,6 +182,44 @@ export class MainWPApiClient {
     return this.post(`/sites/${encodeURIComponent(idOrDomain)}/disconnect`);
   }
 
+  /**
+   * Edit site settings
+   */
+  async editSite(idOrDomain: string, data: {
+    name?: string;
+    groupids?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.put(`/sites/${encodeURIComponent(idOrDomain)}/edit`, data);
+  }
+
+  /**
+   * Suspend a site
+   */
+  async suspendSite(idOrDomain: string): Promise<MainWPApiResponse<unknown>> {
+    return this.post(`/sites/${encodeURIComponent(idOrDomain)}/suspend`);
+  }
+
+  /**
+   * Unsuspend a site
+   */
+  async unsuspendSite(idOrDomain: string): Promise<MainWPApiResponse<unknown>> {
+    return this.post(`/sites/${encodeURIComponent(idOrDomain)}/unsuspend`);
+  }
+
+  /**
+   * Get non-MainWP changes for a site
+   */
+  async getNonMainWPChanges(idOrDomain: string): Promise<MainWPApiResponse<unknown>> {
+    return this.get(`/sites/${encodeURIComponent(idOrDomain)}/non-mainwp-changes`);
+  }
+
+  /**
+   * Remove a site from MainWP (deletes site data)
+   */
+  async removeSite(idOrDomain: string): Promise<MainWPApiResponse<unknown>> {
+    return this.delete(`/sites/${encodeURIComponent(idOrDomain)}`);
+  }
+
   // ============ Plugins API ============
 
   /**
@@ -200,6 +247,24 @@ export class MainWPApiClient {
     });
   }
 
+  /**
+   * Install a plugin on a site
+   */
+  async installPlugin(idOrDomain: string, slug: string): Promise<MainWPApiResponse<unknown>> {
+    return this.post(`/sites/${encodeURIComponent(idOrDomain)}/plugins/install`, {
+      slug,
+    });
+  }
+
+  /**
+   * Delete a plugin from a site
+   */
+  async deletePlugin(idOrDomain: string, slug: string): Promise<MainWPApiResponse<unknown>> {
+    return this.post(`/sites/${encodeURIComponent(idOrDomain)}/plugins/delete`, {
+      slug,
+    });
+  }
+
   // ============ Themes API ============
 
   /**
@@ -215,6 +280,24 @@ export class MainWPApiClient {
   async activateTheme(idOrDomain: string, theme: string): Promise<MainWPApiResponse<unknown>> {
     return this.post(`/sites/${encodeURIComponent(idOrDomain)}/themes/activate`, {
       theme,
+    });
+  }
+
+  /**
+   * Install a theme on a site
+   */
+  async installTheme(idOrDomain: string, slug: string): Promise<MainWPApiResponse<unknown>> {
+    return this.post(`/sites/${encodeURIComponent(idOrDomain)}/themes/install`, {
+      slug,
+    });
+  }
+
+  /**
+   * Delete a theme from a site
+   */
+  async deleteTheme(idOrDomain: string, slug: string): Promise<MainWPApiResponse<unknown>> {
+    return this.post(`/sites/${encodeURIComponent(idOrDomain)}/themes/delete`, {
+      slug,
     });
   }
 
@@ -255,6 +338,174 @@ export class MainWPApiClient {
   async updateThemes(idOrDomain: string, themes?: string[]): Promise<MainWPApiResponse<unknown>> {
     const data = themes ? { themes: themes.join(',') } : {};
     return this.post(`/updates/${encodeURIComponent(idOrDomain)}/update/themes`, data);
+  }
+
+  /**
+   * Update translations
+   */
+  async updateTranslations(idOrDomain: string): Promise<MainWPApiResponse<unknown>> {
+    return this.post(`/updates/${encodeURIComponent(idOrDomain)}/update/translations`);
+  }
+
+  /**
+   * Ignore an update
+   */
+  async ignoreUpdate(data: {
+    type: 'plugin' | 'theme';
+    slug: string;
+    site?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.post('/updates/ignore', data);
+  }
+
+  /**
+   * Unignore an update
+   */
+  async unignoreUpdate(data: {
+    type: 'plugin' | 'theme';
+    slug: string;
+    site?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.post('/updates/unignore', data);
+  }
+
+  /**
+   * List ignored updates
+   */
+  async listIgnoredUpdates(): Promise<MainWPApiResponse<unknown>> {
+    return this.get('/updates/ignored');
+  }
+
+  // ============ Clients API (Pro) ============
+
+  /**
+   * List all clients
+   */
+  async listClients(params?: {
+    page?: number;
+    per_page?: number;
+    search?: string;
+    status?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.get('/clients', params);
+  }
+
+  /**
+   * Get a single client by ID or email
+   */
+  async getClient(idOrEmail: string): Promise<MainWPApiResponse<unknown>> {
+    return this.get(`/clients/${encodeURIComponent(idOrEmail)}`);
+  }
+
+  /**
+   * Add a new client
+   */
+  async addClient(data: {
+    name: string;
+    email: string;
+    company?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+    note?: string;
+    selected_sites?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.post('/clients/add', data);
+  }
+
+  /**
+   * Edit a client
+   */
+  async editClient(idOrEmail: string, data: {
+    name?: string;
+    email?: string;
+    company?: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+    note?: string;
+    selected_sites?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.put(`/clients/${encodeURIComponent(idOrEmail)}/edit`, data);
+  }
+
+  /**
+   * Delete a client
+   */
+  async deleteClient(idOrEmail: string): Promise<MainWPApiResponse<unknown>> {
+    return this.delete(`/clients/${encodeURIComponent(idOrEmail)}`);
+  }
+
+  // ============ Costs API (Pro) ============
+
+  /**
+   * List all costs
+   */
+  async listCosts(params?: {
+    page?: number;
+    per_page?: number;
+    search?: string;
+    status?: string;
+    category?: string;
+    type?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.get('/costs', params);
+  }
+
+  /**
+   * Get a single cost by ID
+   */
+  async getCost(id: string): Promise<MainWPApiResponse<unknown>> {
+    return this.get(`/costs/${encodeURIComponent(id)}`);
+  }
+
+  /**
+   * Add a new cost
+   */
+  async addCost(data: {
+    name: string;
+    type?: 'single' | 'recurring';
+    product_type?: 'plugin' | 'theme' | 'hosting' | 'domain' | 'service' | 'other';
+    price?: number;
+    currency?: string;
+    renewal_frequency?: 'monthly' | 'yearly' | 'lifetime';
+    last_renewal?: string;
+    next_renewal?: string;
+    sites?: string;
+    note?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.put('/costs/add', data);
+  }
+
+  /**
+   * Edit a cost
+   */
+  async editCost(id: string, data: {
+    name?: string;
+    type?: 'single' | 'recurring';
+    product_type?: 'plugin' | 'theme' | 'hosting' | 'domain' | 'service' | 'other';
+    price?: number;
+    currency?: string;
+    renewal_frequency?: 'monthly' | 'yearly' | 'lifetime';
+    last_renewal?: string;
+    next_renewal?: string;
+    sites?: string;
+    note?: string;
+  }): Promise<MainWPApiResponse<unknown>> {
+    return this.put(`/costs/${encodeURIComponent(id)}/edit`, data);
+  }
+
+  /**
+   * Delete a cost
+   */
+  async deleteCost(id: string): Promise<MainWPApiResponse<unknown>> {
+    return this.delete(`/costs/${encodeURIComponent(id)}`);
   }
 
   // ============ Tags API ============
