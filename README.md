@@ -1167,3 +1167,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 - [MainWP](https://mainwp.com/) for the excellent WordPress management platform
 - [Anthropic](https://anthropic.com/) for Claude and the MCP protocol
 - The open-source community for the excellent TypeScript tooling
+
+## Development Status
+
+See [project_status.md](./project_status.md) for recent development activity and context.
