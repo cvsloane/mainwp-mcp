@@ -144,7 +144,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mainwp-mcp.git
+git clone https://github.com/cvsloane/mainwp-mcp.git
 cd mainwp-mcp
 ```
 
@@ -346,7 +346,7 @@ List all connected WordPress sites.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `status` | string | No | Filter by status: `connected`, `disconnected`, `all` |
+| `format` | string | No | Response format: `full` (all details) or `basic` (id, name, url, status) - default: `full` |
 
 **Example Response:**
 ```json
@@ -372,7 +372,7 @@ Get detailed information for a specific site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID from MainWP |
+| `site` | string | Yes | Site ID or domain from MainWP |
 
 **Returns:** Comprehensive site data including plugins, themes, health score, database size, etc.
 
@@ -387,7 +387,7 @@ Force synchronization of site data.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to sync |
+| `site` | string | Yes | Site ID or domain to sync |
 
 #### `mainwp_sites_check`
 Run a health check on a site.
@@ -395,7 +395,7 @@ Run a health check on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to check |
+| `site` | string | Yes | Site ID or domain to check |
 
 #### `mainwp_sites_add`
 Add a new site to MainWP Dashboard.
@@ -413,7 +413,7 @@ Reconnect a disconnected site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to reconnect |
+| `site` | string | Yes | Site ID or domain to reconnect |
 
 #### `mainwp_sites_disconnect`
 Disconnect a site from MainWP (does not delete the site).
@@ -421,7 +421,7 @@ Disconnect a site from MainWP (does not delete the site).
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to disconnect |
+| `site` | string | Yes | Site ID or domain to disconnect |
 
 ---
 
@@ -466,7 +466,7 @@ Apply all pending updates for a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to update |
+| `site` | string | Yes | Site ID or domain to update |
 | `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 #### `mainwp_updates_wp`
@@ -475,7 +475,7 @@ Update WordPress core on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
+| `site` | string | Yes | Site ID or domain |
 | `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 #### `mainwp_updates_plugins`
@@ -484,8 +484,8 @@ Update plugins on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugins` | string[] | No | Specific plugin slugs (omit for all) |
+| `site` | string | Yes | Site ID or domain |
+| `plugins` | string | No | Comma-separated plugin slugs (omit for all) |
 | `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 #### `mainwp_updates_themes`
@@ -494,8 +494,8 @@ Update themes on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `themes` | string[] | No | Specific theme slugs (omit for all) |
+| `site` | string | Yes | Site ID or domain |
+| `themes` | string | No | Comma-separated theme slugs (omit for all) |
 | `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 ---
@@ -508,8 +508,7 @@ List all plugins installed on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `status` | string | No | Filter: `active`, `inactive`, `all` |
+| `site` | string | Yes | Site ID or domain |
 
 **Example Response:**
 ```json
@@ -534,22 +533,24 @@ List all plugins installed on a site.
 ```
 
 #### `mainwp_plugins_activate`
-Activate a plugin on a site.
+Activate one or more plugins on a site.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugin` | string | Yes | Plugin slug to activate |
+| `site` | string | Yes | Site ID or domain |
+| `plugins` | string | Yes | Plugin slug(s) to activate, comma-separated |
+| `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 #### `mainwp_plugins_deactivate`
-Deactivate a plugin on a site.
+Deactivate one or more plugins on a site.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugin` | string | Yes | Plugin slug to deactivate |
+| `site` | string | Yes | Site ID or domain |
+| `plugins` | string | Yes | Plugin slug(s) to deactivate, comma-separated |
+| `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 ---
 
@@ -561,7 +562,7 @@ List all themes installed on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
+| `site` | string | Yes | Site ID or domain |
 
 #### `mainwp_themes_activate`
 Activate a theme on a site.
@@ -569,8 +570,9 @@ Activate a theme on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
+| `site` | string | Yes | Site ID or domain |
 | `theme` | string | Yes | Theme slug to activate |
+| `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 #### `mainwp_themes_install`
 Install a theme from WordPress.org.
