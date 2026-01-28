@@ -40,7 +40,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 
 **43 tools** covering the complete MainWP REST API:
 
-### Site Management (14 tools)
+### Site Management (13 tools)
 - **List & View**: List all sites, get detailed site information, count sites
 - **Health**: Run health checks, track non-MainWP changes
 - **Sync**: Force synchronization to get the latest site data
@@ -144,7 +144,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mainwp-mcp.git
+git clone https://github.com/cvsloane/mainwp-mcp.git
 cd mainwp-mcp
 ```
 
@@ -404,8 +404,11 @@ Add a new site to MainWP Dashboard.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `url` | string | Yes | The site URL |
-| `admin_username` | string | Yes | WordPress admin username |
+| `admin` | string | No | WordPress admin username |
 | `name` | string | No | Display name for the site |
+| `uniqueId` | string | No | MainWP Child unique security ID |
+| `ssl_verify` | boolean | No | Verify SSL certificate (default: true) |
+| `groupids` | string | No | Comma-separated group IDs to assign |
 
 #### `mainwp_sites_reconnect`
 Reconnect a disconnected site.
