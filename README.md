@@ -40,7 +40,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 
 **43 tools** covering the complete MainWP REST API:
 
-### Site Management (14 tools)
+### Site Management (13 tools)
 - **List & View**: List all sites, get detailed site information, count sites
 - **Health**: Run health checks, track non-MainWP changes
 - **Sync**: Force synchronization to get the latest site data
@@ -144,7 +144,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mainwp-mcp.git
+git clone https://github.com/cvsloane/mainwp-mcp.git
 cd mainwp-mcp
 ```
 
@@ -508,8 +508,7 @@ List all plugins installed on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `status` | string | No | Filter: `active`, `inactive`, `all` |
+| `site` | string | Yes | Site ID or domain |
 
 **Example Response:**
 ```json
@@ -534,13 +533,14 @@ List all plugins installed on a site.
 ```
 
 #### `mainwp_plugins_activate`
-Activate a plugin on a site.
+Activate one or more plugins on a site.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugin` | string | Yes | Plugin slug to activate |
+| `site` | string | Yes | Site ID or domain |
+| `plugins` | string | Yes | Plugin slug(s) to activate (comma-separated) |
+| `dry_run` | boolean | No | Simulate without activating (default: true) |
 
 #### `mainwp_plugins_deactivate`
 Deactivate a plugin on a site.
