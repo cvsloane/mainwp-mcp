@@ -144,7 +144,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mainwp-mcp.git
+git clone https://github.com/cvsloane/mainwp-mcp.git
 cd mainwp-mcp
 ```
 
@@ -372,7 +372,7 @@ Get detailed information for a specific site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID from MainWP |
+| `site` | string | Yes | Site ID or domain name |
 
 **Returns:** Comprehensive site data including plugins, themes, health score, database size, etc.
 
@@ -387,7 +387,7 @@ Force synchronization of site data.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to sync |
+| `site` | string | Yes | Site ID or domain to sync |
 
 #### `mainwp_sites_check`
 Run a health check on a site.
@@ -395,7 +395,7 @@ Run a health check on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to check |
+| `site` | string | Yes | Site ID or domain to check |
 
 #### `mainwp_sites_add`
 Add a new site to MainWP Dashboard.
@@ -413,7 +413,7 @@ Reconnect a disconnected site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to reconnect |
+| `site` | string | Yes | Site ID or domain to reconnect |
 
 #### `mainwp_sites_disconnect`
 Disconnect a site from MainWP (does not delete the site).
@@ -421,7 +421,7 @@ Disconnect a site from MainWP (does not delete the site).
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to disconnect |
+| `site` | string | Yes | Site ID or domain to disconnect |
 
 ---
 
@@ -433,8 +433,7 @@ List all pending updates across all sites.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | No | Filter to specific site |
-| `type` | string | No | Filter by type: `wp`, `plugins`, `themes`, `all` |
+| `site` | string | No | Filter to specific site (ID or domain) |
 
 **Example Response:**
 ```json
@@ -461,12 +460,14 @@ List all pending updates across all sites.
 ```
 
 #### `mainwp_updates_apply`
-Apply all pending updates for a site.
+Apply updates to a WordPress site.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to update |
+| `site` | string | Yes | Site ID or domain to update |
+| `type` | string | Yes | Type of updates: `wp`, `plugins`, `themes`, `all` |
+| `items` | string | No | Comma-separated plugin/theme slugs (omit for all) |
 | `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 #### `mainwp_updates_wp`
@@ -475,7 +476,7 @@ Update WordPress core on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
+| `site` | string | Yes | Site ID or domain |
 | `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 #### `mainwp_updates_plugins`
@@ -484,8 +485,8 @@ Update plugins on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugins` | string[] | No | Specific plugin slugs (omit for all) |
+| `site` | string | Yes | Site ID or domain |
+| `plugins` | string | No | Comma-separated plugin slugs (omit for all) |
 | `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 #### `mainwp_updates_themes`
@@ -494,8 +495,8 @@ Update themes on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `themes` | string[] | No | Specific theme slugs (omit for all) |
+| `site` | string | Yes | Site ID or domain |
+| `themes` | string | No | Comma-separated theme slugs (omit for all) |
 | `dry_run` | boolean | No | Simulate without applying (default: true) |
 
 ---
