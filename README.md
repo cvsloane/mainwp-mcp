@@ -38,7 +38,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 
 ## Features
 
-**43 tools** covering the complete MainWP REST API:
+**44 tools** covering the complete MainWP REST API:
 
 ### Site Management (14 tools)
 - **List & View**: List all sites, get detailed site information, count sites
@@ -144,7 +144,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mainwp-mcp.git
+git clone https://github.com/cvsloane/mainwp-mcp.git
 cd mainwp-mcp
 ```
 
