@@ -144,7 +144,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mainwp-mcp.git
+git clone https://github.com/cvsloane/mainwp-mcp.git
 cd mainwp-mcp
 ```
 
@@ -404,7 +404,7 @@ Add a new site to MainWP Dashboard.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `url` | string | Yes | The site URL |
-| `admin_username` | string | Yes | WordPress admin username |
+| `admin` | string | No | WordPress admin username |
 | `name` | string | No | Display name for the site |
 
 #### `mainwp_sites_reconnect`
@@ -534,22 +534,24 @@ List all plugins installed on a site.
 ```
 
 #### `mainwp_plugins_activate`
-Activate a plugin on a site.
+Activate one or more plugins on a site.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugin` | string | Yes | Plugin slug to activate |
+| `site` | string | Yes | Site ID or domain |
+| `plugins` | string | Yes | Plugin slug(s) to activate, comma-separated |
+| `dry_run` | boolean | No | Simulate without changes (default: true) |
 
 #### `mainwp_plugins_deactivate`
-Deactivate a plugin on a site.
+Deactivate one or more plugins on a site.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugin` | string | Yes | Plugin slug to deactivate |
+| `site` | string | Yes | Site ID or domain |
+| `plugins` | string | Yes | Plugin slug(s) to deactivate, comma-separated |
+| `dry_run` | boolean | No | Simulate without changes (default: true) |
 
 ---
 
@@ -561,7 +563,7 @@ List all themes installed on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
+| `site` | string | Yes | Site ID or domain |
 
 #### `mainwp_themes_activate`
 Activate a theme on a site.
@@ -569,8 +571,9 @@ Activate a theme on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
+| `site` | string | Yes | Site ID or domain |
 | `theme` | string | Yes | Theme slug to activate |
+| `dry_run` | boolean | No | Simulate without changes (default: true) |
 
 #### `mainwp_themes_install`
 Install a theme from WordPress.org.
