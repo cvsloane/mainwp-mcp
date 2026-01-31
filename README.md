@@ -40,10 +40,10 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 
 **43 tools** covering the complete MainWP REST API:
 
-### Site Management (14 tools)
-- **List & View**: List all sites, get detailed site information, count sites
+### Site Management (15 tools)
+- **List & View**: List all sites (basic/full format), get detailed site information, count sites
 - **Health**: Run health checks, track non-MainWP changes
-- **Sync**: Force synchronization to get the latest site data
+- **Sync**: Force synchronization for single site or all sites
 - **Lifecycle**: Add, reconnect, disconnect, suspend, unsuspend, remove sites
 - **Edit**: Modify site settings and group assignments
 
