@@ -1,12 +1,16 @@
 # MainWP MCP Server
 
-A Model Context Protocol (MCP) server that enables AI assistants like Claude to manage WordPress sites through the [MainWP Dashboard](https://mainwp.com/) REST API.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
+
+A Model Context Protocol (MCP) server that brings AI-powered WordPress management to your fingertips. Connect Claude Code to your [MainWP Dashboard](https://mainwp.com/) and manage all your WordPress sites through natural conversation.
 
 ## Table of Contents
 
-- [Overview](#overview)
+- [Why MainWP MCP?](#why-mainwp-mcp)
 - [Features](#features)
 - [Architecture](#architecture)
+- [Quick Start](#quick-start)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [MainWP Dashboard Setup](#mainwp-dashboard-setup)
@@ -23,67 +27,78 @@ A Model Context Protocol (MCP) server that enables AI assistants like Claude to 
 
 ---
 
-## Overview
+## Why MainWP MCP?
 
-MainWP MCP Server bridges the gap between AI assistants and WordPress site management. It allows Claude (via Claude Code) to:
+Managing multiple WordPress sites is time-consuming. You log into each dashboard, check for updates, review security scans, and perform routine maintenance—repeatedly across dozens or hundreds of sites.
 
-- Monitor the health and status of all your WordPress sites
-- Check for and apply updates to WordPress core, plugins, and themes
-- Manage plugins and themes across single or multiple sites
-- Add, sync, and manage sites in your MainWP Dashboard
+**MainWP MCP Server changes the game.**
 
-This is particularly useful for agencies, freelancers, or anyone managing multiple WordPress sites who wants to leverage AI assistance for routine maintenance tasks.
+Instead of clicking through dashboards, you simply *ask*:
+
+> "Which of my sites need updates?"
+> "Update all plugins across my e-commerce sites"
+> "Show me sites running outdated PHP versions"
+> "Deactivate the contact form plugin on all staging sites"
+
+Claude handles the rest, using the full power of MainWP's REST API—all through natural conversation.
+
+### Perfect For
+
+- **Agencies** managing 50+ client sites
+- **Freelancers** juggling multiple WordPress projects
+- **DevOps teams** automating maintenance workflows
+- **Site owners** who prefer conversational interfaces
 
 ---
 
 ## Features
 
-**43 tools** covering the complete MainWP REST API:
+**43 powerful tools** organized by function:
 
 ### Site Management (14 tools)
-- **List & View**: List all sites, get detailed site information, count sites
-- **Health**: Run health checks, track non-MainWP changes
-- **Sync**: Force synchronization to get the latest site data
-- **Lifecycle**: Add, reconnect, disconnect, suspend, unsuspend, remove sites
-- **Edit**: Modify site settings and group assignments
+| Capability | Tools |
+|------------|-------|
+| Discovery | List sites, view details, count totals |
+| Health | Run checks, track non-MainWP changes |
+| Sync | Force synchronization, refresh data |
+| Lifecycle | Add, reconnect, disconnect, suspend, remove |
+| Organization | Edit settings, manage group assignments |
 
 ### Update Management (9 tools)
-- **Update Overview**: See all pending updates across your entire network
-- **WordPress Core**: Update WordPress to the latest version
-- **Plugins**: Update individual or all plugins
-- **Themes**: Update individual or all themes
-- **Translations**: Update site translations
-- **Ignore Management**: Ignore/unignore specific updates, list ignored updates
-- **Dry-Run Mode**: Preview what updates would be applied without making changes
+- **Overview**: See pending updates across your entire network
+- **WordPress Core**: Update to latest versions
+- **Plugins & Themes**: Update individually or in bulk
+- **Translations**: Keep language packs current
+- **Ignore Management**: Skip problematic updates
+- **Dry-Run Mode**: Preview changes before applying
 
 ### Plugin Management (5 tools)
-- **Inventory**: List all plugins installed on any site
-- **Activation**: Activate or deactivate plugins
-- **Installation**: Install plugins from WordPress.org
-- **Removal**: Delete unused plugins
+- Inventory all installed plugins
+- Activate/deactivate remotely
+- Install from WordPress.org
+- Delete unused plugins
 
 ### Theme Management (4 tools)
-- **Inventory**: List all themes installed on any site
-- **Activation**: Change the active theme on any site
-- **Installation**: Install themes from WordPress.org
-- **Removal**: Delete unused themes
+- List installed themes
+- Switch active themes
+- Install new themes
+- Remove unused themes
 
-### Client Management (5 tools) - Pro
-- **CRM**: List, add, edit, delete clients
-- **Site Assignment**: Assign sites to clients
+### Client Management (5 tools) — *Pro*
+Requires MainWP Pro with Client Reports extension:
+- Full CRM functionality (add, edit, delete clients)
+- Site-to-client assignments
+- Contact and company management
 
-### Cost Tracking (5 tools) - Pro
-- **Expenses**: Track plugin, theme, hosting, domain, and service costs
-- **Renewals**: Monitor recurring costs and renewal dates
+### Cost Tracking (5 tools) — *Pro*
+Requires MainWP Pro with Cost Tracker extension:
+- Track plugin, theme, hosting, and domain costs
+- Monitor renewal dates
+- Calculate total cost of ownership
 
 ### Tag Management (2 tools)
-- **Organization**: List all tags, get sites by tag
-
-### Safety & Security
-- **Dry-Run by Default**: All destructive operations simulate first
-- **Bulk Confirmation**: Multi-site operations require explicit confirmation
-- **Rate Limiting**: Prevents overwhelming your servers
-- **Pro Feature Handling**: Clear error messages when Pro extensions are required
+- Organize sites with tags/groups
+- Filter sites by category
 
 ---
 
@@ -111,31 +126,62 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
                         └──────────┘ └──────────┘ └──────────┘
 ```
 
+**Communication Flow:**
+1. You ask Claude a question in natural language
+2. Claude selects the appropriate MCP tool(s)
+3. The MCP server translates this to MainWP REST API calls
+4. Your MainWP Dashboard executes actions on child sites
+5. Results flow back to you as conversational responses
+
+---
+
+## Quick Start
+
+Get up and running in 5 minutes:
+
+```bash
+# 1. Clone and install
+git clone https://github.com/cvsloane/mainwp-mcp.git
+cd mainwp-mcp
+npm install && npm run build
+
+# 2. Configure
+cp .env.example .env.local
+# Edit .env.local with your MainWP credentials
+
+# 3. Add to Claude Code
+# See [Claude Code Integration](#claude-code-integration) below
+
+# 4. Start managing
+# Ask Claude: "List all my WordPress sites"
+```
+
 ---
 
 ## Prerequisites
 
-### Required Software
+### Software Requirements
 
-| Software | Version | Purpose |
-|----------|---------|---------|
-| Node.js | 18.0.0+ | Runtime environment |
-| npm | 8.0.0+ | Package management |
-| Git | Any | Cloning the repository |
+| Software | Minimum | Recommended |
+|----------|---------|-------------|
+| Node.js | 18.0.0 | 20.x LTS |
+| npm | 8.0.0 | 10.x |
+| Git | Any | Latest |
 
-### Required Infrastructure
+### Infrastructure Requirements
 
-1. **MainWP Dashboard** - A WordPress installation with the [MainWP Dashboard plugin](https://wordpress.org/plugins/mainwp/) installed and activated
+1. **MainWP Dashboard** — A WordPress installation with the [MainWP Dashboard plugin](https://wordpress.org/plugins/mainwp/) installed and activated
 
-2. **MainWP Child Sites** - Each WordPress site you want to manage must have the [MainWP Child plugin](https://wordpress.org/plugins/mainwp-child/) installed and connected to your Dashboard
+2. **Connected Child Sites** — Each WordPress site you want to manage must have the [MainWP Child plugin](https://wordpress.org/plugins/mainwp-child/) installed and connected
 
-3. **REST API Access** - MainWP Dashboard must have the REST API enabled (included in MainWP 4.0+)
+3. **REST API Access** — MainWP Dashboard must have the REST API enabled (built into MainWP 4.0+)
 
-### Recommended
+### Performance Recommendations
 
-- **HTTPS**: Your MainWP Dashboard should be served over HTTPS
-- **PHP 8.1+**: On your MainWP Dashboard for best performance
-- **Adequate Memory**: 512MB+ PHP memory limit on Dashboard (1GB for 50+ sites)
+- **HTTPS**: Required for secure API communication
+- **PHP 8.1+**: On your MainWP Dashboard for optimal performance
+- **Memory**: 512MB PHP memory minimum (1GB+ for 50+ sites)
+- **Rate Limiting**: Consider your Dashboard's capacity when setting `MAINWP_RATE_LIMIT_PER_MINUTE`
 
 ---
 
@@ -144,7 +190,7 @@ This is particularly useful for agencies, freelancers, or anyone managing multip
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/mainwp-mcp.git
+git clone https://github.com/cvsloane/mainwp-mcp.git
 cd mainwp-mcp
 ```
 
@@ -154,11 +200,11 @@ cd mainwp-mcp
 npm install
 ```
 
-This installs:
-- `@modelcontextprotocol/sdk` - MCP protocol implementation
-- `axios` - HTTP client for API requests
-- `zod` - Runtime type validation
-- `dotenv` - Environment variable management
+**What's installed:**
+- `@modelcontextprotocol/sdk` — MCP protocol implementation
+- `axios` — HTTP client for API requests
+- `zod` — Runtime type validation
+- `dotenv` — Environment variable management
 
 ### Step 3: Build the Project
 
@@ -174,25 +220,25 @@ This compiles TypeScript to JavaScript in the `dist/` directory.
 npm start
 ```
 
-You should see:
+Expected output:
 ```
 mainwp-mcp v1.0.0 started
 ```
 
-Press `Ctrl+C` to stop the server.
+Press `Ctrl+C` to stop.
 
 ---
 
 ## MainWP Dashboard Setup
 
-Before using this MCP server, you need to configure your MainWP Dashboard.
+Before the MCP server can manage your sites, configure your MainWP Dashboard:
 
 ### Step 1: Install MainWP Dashboard
 
 If you haven't already:
 
 1. Log into your WordPress admin panel
-2. Go to **Plugins → Add New**
+2. Navigate to **Plugins → Add New**
 3. Search for "MainWP Dashboard"
 4. Click **Install Now**, then **Activate**
 5. Complete the MainWP setup wizard
@@ -201,32 +247,39 @@ If you haven't already:
 
 For each WordPress site you want to manage:
 
-1. On the child site, install and activate the **MainWP Child** plugin
+1. Install and activate the **MainWP Child** plugin on the child site
 2. In your MainWP Dashboard, go to **MainWP → Sites → Add New**
 3. Enter the site URL and administrator credentials
 4. Click **Add Site**
 
 ### Step 3: Enable REST API
 
-1. In your MainWP Dashboard, go to **MainWP → Settings → REST API**
+1. Go to **MainWP → Settings → REST API**
 2. Ensure the REST API is **Enabled**
 3. Click **Add API Key**
-4. Fill in the details:
+4. Configure the key:
    - **Description**: `Claude Code MCP Server` (or any descriptive name)
-   - **Permissions**: Select the permissions you want to grant
-     - **Read**: Sites, plugins, themes, updates (recommended)
-     - **Write**: Updates, plugin activation (optional)
+   - **Permissions**: Select based on your needs
+     - **Read**: Sites, plugins, themes, updates *(recommended minimum)*
+     - **Write**: Updates, plugin activation *(required for management)*
 5. Click **Generate API Key**
-6. **Important**: Copy both the **Consumer Key** and **Consumer Secret** immediately - the secret won't be shown again
+6. **⚠️ Important**: Copy both the **Consumer Key** and **Consumer Secret** immediately—the secret is shown only once
 
-### Step 4: Note Your API Credentials
+### Step 4: Gather Your Credentials
 
-You'll need:
-- **Dashboard URL**: e.g., `https://your-mainwp-dashboard.com`
-- **Consumer Key**: A 40-character hex string
-- **Consumer Secret**: A 40-character hex string
+You'll need three pieces of information:
 
-The API key format used by this server is: `consumer_key==consumer_secret`
+| Credential | Example | Where to Find |
+|------------|---------|---------------|
+| Dashboard URL | `https://dashboard.example.com` | Your MainWP Dashboard address |
+| Consumer Key | `abc123...xyz` | REST API settings |
+| Consumer Secret | `def456...uvw` | REST API settings (shown once) |
+
+**API Key Format:** The MCP server expects credentials in this format:
+```
+consumer_key==consumer_secret
+```
+(Note the double equals sign between key and secret)
 
 ---
 
@@ -234,47 +287,40 @@ The API key format used by this server is: `consumer_key==consumer_secret`
 
 ### Environment Variables
 
-Create a `.env.local` file in the project root:
+Create your configuration file:
 
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local` with your settings:
+Edit `.env.local`:
 
 ```bash
-# Required: MainWP Dashboard URL
-# The full URL to your MainWP Dashboard WordPress installation
+# Required: Your MainWP Dashboard URL
 MAINWP_DASHBOARD_URL=https://your-mainwp-dashboard.com
 
-# Required: API Key
-# Format: consumer_key==consumer_secret (note the double equals sign)
-MAINWP_API_KEY=abc123def456...==xyz789...
+# Required: API credentials (key==secret format)
+MAINWP_API_KEY=abc123def456...==xyz789uvw...
 
-# Optional: Safety Settings
-# Enable dry-run mode by default (recommended: true)
+# Optional: Safety settings (recommended values shown)
 MAINWP_ENABLE_DRY_RUN_BY_DEFAULT=true
-
-# Require explicit confirmation for bulk operations (recommended: true)
 MAINWP_REQUIRE_CONFIRMATION_BULK=true
 
-# Optional: Test mode (no side effects)
+# Optional: Development settings
 MAINWP_TEST_MODE=false
-
-# Rate limit: maximum API requests per minute (default: 60)
 MAINWP_RATE_LIMIT_PER_MINUTE=60
 ```
 
-### Configuration Options Reference
+### Configuration Reference
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MAINWP_DASHBOARD_URL` | Yes | - | Full URL to your MainWP Dashboard |
-| `MAINWP_API_KEY` | Yes | - | API credentials in `key==secret` format |
-| `MAINWP_ENABLE_DRY_RUN_BY_DEFAULT` | No | `true` | Simulate operations by default |
-| `MAINWP_REQUIRE_CONFIRMATION_BULK` | No | `true` | Require confirmation for multi-site ops |
-| `MAINWP_TEST_MODE` | No | `false` | Simulate mutating operations without side effects |
-| `MAINWP_RATE_LIMIT_PER_MINUTE` | No | `60` | Max API requests per minute |
+| `MAINWP_DASHBOARD_URL` | ✅ | — | Full URL to your MainWP Dashboard |
+| `MAINWP_API_KEY` | ✅ | — | Credentials in `key==secret` format |
+| `MAINWP_ENABLE_DRY_RUN_BY_DEFAULT` | ❌ | `true` | Simulate operations by default |
+| `MAINWP_REQUIRE_CONFIRMATION_BULK` | ❌ | `true` | Confirm multi-site operations |
+| `MAINWP_TEST_MODE` | ❌ | `false` | Simulate without API calls |
+| `MAINWP_RATE_LIMIT_PER_MINUTE` | ❌ | `60` | Max requests per minute |
 
 ---
 
@@ -282,10 +328,10 @@ MAINWP_RATE_LIMIT_PER_MINUTE=60
 
 ### Option 1: Global Configuration (Recommended)
 
-Add to your Claude Code MCP configuration file:
+Add to your Claude Code MCP configuration:
 
-**Linux/macOS**: `~/.config/claude-code/mcp.json`
-**Windows**: `%APPDATA%\claude-code\mcp.json`
+**Linux/macOS:** `~/.config/claude-code/mcp.json`
+**Windows:** `%APPDATA%\claude-code\mcp.json`
 
 ```json
 {
@@ -307,6 +353,8 @@ Add to your Claude Code MCP configuration file:
 }
 ```
 
+**Tip:** Use absolute paths to avoid issues with Claude Code's working directory.
+
 ### Option 2: Project-Specific Configuration
 
 Create `.mcp.json` in your project directory:
@@ -327,18 +375,25 @@ Create `.mcp.json` in your project directory:
 }
 ```
 
-### Verifying the Integration
+### Verifying Integration
 
-1. Restart Claude Code after adding the configuration
-2. Ask Claude: "What MCP tools are available?"
-3. You should see the `mainwp_*` tools listed
-4. Test with: "List all MainWP sites"
+1. **Restart Claude Code** — MCP changes require a full restart
+2. **Check available tools:**
+   ```
+   You: What MCP tools are available?
+   ```
+   You should see `mainwp_*` tools listed.
+
+3. **Test connectivity:**
+   ```
+   You: List all my MainWP sites
+   ```
 
 ---
 
 ## Available Tools
 
-### Site Management Tools
+### Site Management
 
 #### `mainwp_sites_list`
 List all connected WordPress sites.
@@ -346,7 +401,7 @@ List all connected WordPress sites.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `status` | string | No | Filter by status: `connected`, `disconnected`, `all` |
+| `status` | string | No | Filter: `connected`, `disconnected`, `all` |
 
 **Example Response:**
 ```json
@@ -354,8 +409,8 @@ List all connected WordPress sites.
   "sites": [
     {
       "id": "1",
-      "name": "My Blog",
-      "url": "https://myblog.com",
+      "name": "Client Blog",
+      "url": "https://clientblog.com",
       "status": "connected",
       "wp_version": "6.4.2",
       "php_version": "8.2",
@@ -372,14 +427,9 @@ Get detailed information for a specific site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID from MainWP |
+| `site_id` | string | ✅ | Site ID from MainWP |
 
-**Returns:** Comprehensive site data including plugins, themes, health score, database size, etc.
-
-#### `mainwp_sites_count`
-Get the total count of connected sites.
-
-**Parameters:** None
+**Returns:** Comprehensive site data including plugins, themes, health score, database size.
 
 #### `mainwp_sites_sync`
 Force synchronization of site data.
@@ -387,15 +437,7 @@ Force synchronization of site data.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to sync |
-
-#### `mainwp_sites_check`
-Run a health check on a site.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to check |
+| `site_id` | string | ✅ | Site ID to sync |
 
 #### `mainwp_sites_add`
 Add a new site to MainWP Dashboard.
@@ -403,38 +445,20 @@ Add a new site to MainWP Dashboard.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `url` | string | Yes | The site URL |
-| `admin_username` | string | Yes | WordPress admin username |
-| `name` | string | No | Display name for the site |
+| `url` | string | ✅ | Site URL |
+| `admin_username` | string | ✅ | WordPress admin username |
+| `name` | string | No | Display name |
 
-#### `mainwp_sites_reconnect`
-Reconnect a disconnected site.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to reconnect |
-
-#### `mainwp_sites_disconnect`
-Disconnect a site from MainWP (does not delete the site).
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to disconnect |
-
----
-
-### Update Management Tools
+### Update Management
 
 #### `mainwp_updates_list`
-List all pending updates across all sites.
+List all pending updates across sites.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `site_id` | string | No | Filter to specific site |
-| `type` | string | No | Filter by type: `wp`, `plugins`, `themes`, `all` |
+| `type` | string | No | Filter: `wp`, `plugins`, `themes`, `all` |
 
 **Example Response:**
 ```json
@@ -442,8 +466,8 @@ List all pending updates across all sites.
   "updates": [
     {
       "site_id": "1",
-      "site_name": "My Blog",
-      "site_url": "https://myblog.com",
+      "site_name": "Client Blog",
+      "site_url": "https://clientblog.com",
       "wp_upgrades": {
         "current": "6.4.1",
         "new": "6.4.2"
@@ -466,17 +490,8 @@ Apply all pending updates for a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to update |
-| `dry_run` | boolean | No | Simulate without applying (default: true) |
-
-#### `mainwp_updates_wp`
-Update WordPress core on a site.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `dry_run` | boolean | No | Simulate without applying (default: true) |
+| `site_id` | string | ✅ | Site ID |
+| `dry_run` | boolean | No | Simulate first (default: `true`) |
 
 #### `mainwp_updates_plugins`
 Update plugins on a site.
@@ -484,489 +499,217 @@ Update plugins on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugins` | string[] | No | Specific plugin slugs (omit for all) |
-| `dry_run` | boolean | No | Simulate without applying (default: true) |
+| `site_id` | string | ✅ | Site ID |
+| `plugins` | string[] | No | Specific slugs (omit for all) |
+| `dry_run` | boolean | No | Simulate first (default: `true`) |
 
-#### `mainwp_updates_themes`
-Update themes on a site.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `themes` | string[] | No | Specific theme slugs (omit for all) |
-| `dry_run` | boolean | No | Simulate without applying (default: true) |
-
----
-
-### Plugin Management Tools
+### Plugin Management
 
 #### `mainwp_plugins_list`
-List all plugins installed on a site.
+List all plugins on a site.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
+| `site_id` | string | ✅ | Site ID |
 | `status` | string | No | Filter: `active`, `inactive`, `all` |
 
-**Example Response:**
-```json
-{
-  "plugins": [
-    {
-      "name": "Akismet Anti-spam",
-      "slug": "akismet",
-      "version": "5.1",
-      "active": true,
-      "update": null
-    },
-    {
-      "name": "Hello Dolly",
-      "slug": "hello-dolly",
-      "version": "1.7.2",
-      "active": false,
-      "update": null
-    }
-  ]
-}
-```
-
-#### `mainwp_plugins_activate`
-Activate a plugin on a site.
+#### `mainwp_plugins_activate` / `mainwp_plugins_deactivate`
+Toggle plugin status.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugin` | string | Yes | Plugin slug to activate |
+| `site_id` | string | ✅ | Site ID |
+| `plugin` | string | ✅ | Plugin slug |
 
-#### `mainwp_plugins_deactivate`
-Deactivate a plugin on a site.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `plugin` | string | Yes | Plugin slug to deactivate |
-
----
-
-### Theme Management Tools
+### Theme Management
 
 #### `mainwp_themes_list`
-List all themes installed on a site.
+List all themes on a site.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
+| `site_id` | string | ✅ | Site ID |
 
 #### `mainwp_themes_activate`
-Activate a theme on a site.
+Change the active theme.
 
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID |
-| `theme` | string | Yes | Theme slug to activate |
+| `site_id` | string | ✅ | Site ID |
+| `theme` | string | ✅ | Theme slug |
 
-#### `mainwp_themes_install`
-Install a theme from WordPress.org.
+### Extended Tools
 
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | Yes | Site ID or domain |
-| `slug` | string | Yes | Theme slug from WordPress.org |
-| `dry_run` | boolean | No | Simulate without installing (default: true) |
+For complete documentation of all 43 tools, including Client Management, Cost Tracking, and Tag Management, see the inline documentation or use Claude's tool discovery:
 
-#### `mainwp_themes_delete`
-Delete a theme from a site (must not be active).
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | Yes | Site ID or domain |
-| `slug` | string | Yes | Theme slug to delete |
-| `dry_run` | boolean | No | Simulate without deleting (default: true) |
-
----
-
-### Extended Site Management Tools
-
-#### `mainwp_sites_edit`
-Edit site settings in MainWP Dashboard.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | Yes | Site ID or domain |
-| `name` | string | No | New display name |
-| `groupids` | string | No | Comma-separated group IDs |
-| `dry_run` | boolean | No | Simulate without changes (default: true) |
-
-#### `mainwp_sites_suspend`
-Suspend a site (disable monitoring and updates).
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | Yes | Site ID or domain |
-| `dry_run` | boolean | No | Simulate without suspending (default: true) |
-
-#### `mainwp_sites_unsuspend`
-Unsuspend a site (re-enable monitoring and updates).
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | Yes | Site ID or domain |
-| `dry_run` | boolean | No | Simulate without unsuspending (default: true) |
-
-#### `mainwp_sites_changes`
-Get list of changes made outside MainWP (direct WordPress admin changes).
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | Yes | Site ID or domain |
-
-#### `mainwp_sites_remove`
-Permanently remove a site from MainWP Dashboard.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | Yes | Site ID or domain |
-| `confirmed` | boolean | Yes | Must be true to confirm deletion |
-
----
-
-### Extended Update Management Tools
-
-#### `mainwp_updates_translations`
-Update translations on a site.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | Yes | Site ID or domain |
-| `dry_run` | boolean | No | Simulate without updating (default: true) |
-
-#### `mainwp_updates_ignore`
-Ignore a plugin or theme update (globally or per-site).
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `type` | string | Yes | `plugin` or `theme` |
-| `slug` | string | Yes | Plugin or theme slug |
-| `site` | string | No | Specific site (omit for global) |
-
-#### `mainwp_updates_unignore`
-Stop ignoring a plugin or theme update.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `type` | string | Yes | `plugin` or `theme` |
-| `slug` | string | Yes | Plugin or theme slug |
-| `site` | string | No | Specific site (omit for global) |
-
-#### `mainwp_updates_ignored`
-List all ignored updates.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `site` | string | No | Filter by specific site |
-
----
-
-### Client Management Tools (Pro)
-
-Requires MainWP Pro with Client Reports extension.
-
-#### `mainwp_clients_list`
-List all clients.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `search` | string | No | Search by name or email |
-| `page` | number | No | Page number |
-| `per_page` | number | No | Results per page |
-
-#### `mainwp_clients_get`
-Get detailed information about a client.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `client` | string | Yes | Client ID or email |
-
-#### `mainwp_clients_add`
-Add a new client.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `name` | string | Yes | Client name |
-| `email` | string | Yes | Client email |
-| `company` | string | No | Company name |
-| `phone` | string | No | Phone number |
-| `address` | string | No | Street address |
-| `city` | string | No | City |
-| `state` | string | No | State/Province |
-| `zip` | string | No | ZIP/Postal code |
-| `country` | string | No | Country |
-| `note` | string | No | Internal notes |
-| `selected_sites` | string | No | Comma-separated site IDs |
-
-#### `mainwp_clients_edit`
-Edit a client's information.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `client` | string | Yes | Client ID or email |
-| `dry_run` | boolean | No | Simulate without changes (default: true) |
-| *(all other fields from add)* | | No | Fields to update |
-
-#### `mainwp_clients_delete`
-Delete a client.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `client` | string | Yes | Client ID or email |
-| `confirmed` | boolean | Yes | Must be true to confirm deletion |
-
----
-
-### Cost Tracking Tools (Pro)
-
-Requires MainWP Pro with Cost Tracker extension.
-
-#### `mainwp_costs_list`
-List all tracked costs.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `search` | string | No | Search by name |
-| `type` | string | No | `single` or `recurring` |
-| `product_type` | string | No | `plugin`, `theme`, `hosting`, `domain`, `service`, `other` |
-| `page` | number | No | Page number |
-| `per_page` | number | No | Results per page |
-
-#### `mainwp_costs_get`
-Get details about a specific cost.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `cost` | string | Yes | Cost ID |
-
-#### `mainwp_costs_add`
-Add a new cost entry.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `name` | string | Yes | Cost name/description |
-| `type` | string | No | `single` or `recurring` (default: single) |
-| `product_type` | string | No | Category (default: other) |
-| `price` | number | No | Cost amount |
-| `currency` | string | No | Currency code (default: USD) |
-| `renewal_frequency` | string | No | `monthly`, `yearly`, or `lifetime` |
-| `last_renewal` | string | No | Date (YYYY-MM-DD) |
-| `next_renewal` | string | No | Date (YYYY-MM-DD) |
-| `sites` | string | No | Comma-separated site IDs |
-| `note` | string | No | Additional notes |
-
-#### `mainwp_costs_edit`
-Edit a cost entry.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `cost` | string | Yes | Cost ID |
-| `dry_run` | boolean | No | Simulate without changes (default: true) |
-| *(all other fields from add)* | | No | Fields to update |
-
-#### `mainwp_costs_delete`
-Delete a cost entry.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `cost` | string | Yes | Cost ID |
-| `confirmed` | boolean | Yes | Must be true to confirm deletion |
-
----
-
-### Tag Management Tools
-
-#### `mainwp_tags_list`
-List all tags/groups defined in MainWP.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `search` | string | No | Filter tags by name |
-
-#### `mainwp_tags_sites`
-Get all sites assigned to a specific tag.
-
-**Parameters:**
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| `tag` | string | Yes | Tag ID or name |
+```
+You: What MainWP tools are available for managing clients?
+```
 
 ---
 
 ## Usage Examples
 
-Once integrated with Claude Code, you can interact using natural language.
+### Daily Workflow Examples
 
-### Checking Site Status
-
+#### Morning Site Check
 ```
-You: "List all my WordPress sites"
-Claude: [Calls mainwp_sites_list]
-"You have 5 connected sites:
-1. My Blog (https://myblog.com) - WordPress 6.4.2, PHP 8.2
-2. Client Site A (https://clienta.com) - WordPress 6.4.2, PHP 8.1
-..."
-```
+You: Check the health of all my sites
 
-### Checking for Updates
+Claude: I'll run health checks on all your connected sites...
 
-```
-You: "What updates are available across all sites?"
-Claude: [Calls mainwp_updates_list]
-"I found updates available:
+✅ All Systems Operational (8 sites)
+   All sites are healthy and up to date
 
-My Blog (https://myblog.com):
-- WordPress: 6.4.1 → 6.4.2
-- Akismet: 5.0 → 5.1
-- Yoast SEO: 21.5 → 21.6
-
-Client Site A (https://clienta.com):
-- WordPress: 6.4.2 (up to date)
-- WooCommerce: 8.3.0 → 8.4.0
-..."
+⚠️  Needs Attention (2 sites)
+   - client-site.com: 3 pending plugin updates
+   - blog-example.com: PHP version approaching EOL (7.4)
 ```
 
-### Applying Updates (Dry Run)
-
+#### Update Management
 ```
-You: "Update plugins on myblog.com"
-Claude: [Calls mainwp_updates_plugins with dry_run=true]
-"Dry run completed. If applied, these updates would be installed:
-- Akismet: 5.0 → 5.1
-- Yoast SEO: 21.5 → 21.6
+You: What updates are available?
 
-Would you like me to apply these updates for real?"
+Claude: I found updates across 5 sites:
 
-You: "Yes, apply them"
-Claude: [Calls mainwp_updates_plugins with dry_run=false]
-"Updates applied successfully:
-- Akismet updated to 5.1
-- Yoast SEO updated to 21.6"
-```
+Site: client-store.com
+├── WordPress: 6.4.1 → 6.4.2
+├── WooCommerce: 8.3.0 → 8.4.0
+└── Yoast SEO: 21.5 → 21.6
 
-### Plugin Management
+Site: blog-example.com
+└── Akismet: 5.0 → 5.1
 
-```
-You: "What plugins are installed on site ID 3?"
-Claude: [Calls mainwp_plugins_list]
-"Site 3 has 12 plugins installed:
-
-Active (8):
-- Akismet Anti-spam (5.1)
-- Yoast SEO (21.6)
-- WooCommerce (8.4.0)
-...
-
-Inactive (4):
-- Hello Dolly (1.7.2)
-..."
-
-You: "Deactivate Hello Dolly on that site"
-Claude: [Calls mainwp_plugins_deactivate]
-"Hello Dolly has been deactivated on site 3."
+Would you like me to apply these? I can do them all at once or site by site.
 ```
 
-### Security Check
-
+#### Bulk Operations with Safety
 ```
-You: "Which of my sites have outdated PHP versions?"
-Claude: [Calls mainwp_sites_list, analyzes results]
-"2 sites are running outdated PHP:
-- Old Client Site (https://oldclient.com) - PHP 7.4 (EOL)
-- Legacy Site (https://legacy.com) - PHP 8.0 (security fixes only)
+You: Update all plugins on all sites
 
-I recommend upgrading these to PHP 8.2 or 8.3."
+Claude: This will update plugins on 12 sites:
+- client-store.com (3 plugins)
+- blog-example.com (1 plugin)
+- ...and 10 more
+
+⚠️ This is a bulk operation. Please confirm:
+1. Review the list above
+2. Reply "confirm bulk update" to proceed
+3. Or specify specific sites to update
+
+You: confirm bulk update
+
+Claude: ✅ Updates completed successfully:
+- 12 sites processed
+- 23 plugins updated
+- 0 errors
+```
+
+#### Security Audit
+```
+You: Which sites are running outdated PHP?
+
+Claude: Analyzing PHP versions across your network...
+
+🔴 Critical (EOL - No security updates)
+├── legacy-site.com: PHP 7.4 (EOL Nov 2022)
+└── old-client.com: PHP 7.3 (EOL Dec 2021)
+
+🟡 Warning (Security fixes only)
+└── staging-site.com: PHP 8.0 (ends Nov 2023)
+
+💡 Recommendation: Upgrade to PHP 8.2 or 8.3 for active support and performance improvements.
+```
+
+#### Plugin Management
+```
+You: Deactivate the contact form plugin on all staging sites
+
+Claude: I'll deactivate "contact-form-7" on sites tagged as staging...
+
+✅ Deactivated on 3 staging sites:
+- staging-client1.com
+- staging-client2.com
+- staging-internal.com
+
+⚠️ Skipped 5 production sites (safety filter active)
 ```
 
 ---
 
 ## Safety Features
 
-### Dry-Run Mode
+### Dry-Run Mode (Default: Enabled)
 
-By default, all operations that modify sites run in dry-run mode. This means:
+All destructive operations simulate first. You'll see exactly what would happen before any changes are made.
 
-- The operation is simulated but not executed
-- You see what would happen without any risk
-- You must explicitly set `dry_run: false` to apply changes
+**Example:**
+```
+You: Update WordPress on site 5
 
-**To disable dry-run by default** (not recommended for production):
+Claude: 🔍 Dry run results for site 5 (client-blog.com):
+
+Planned Changes:
+├── WordPress Core: 6.4.1 → 6.4.2
+├── Database updates: Yes (2 schema changes)
+└── Estimated downtime: ~30 seconds
+
+To apply these changes, say "apply the update" or set dry_run to false.
+```
+
+**To disable** (not recommended for production):
 ```bash
 MAINWP_ENABLE_DRY_RUN_BY_DEFAULT=false
 ```
 
 ### Bulk Operation Confirmation
 
-When operations would affect multiple sites, the server requires explicit confirmation:
+Operations affecting multiple sites require explicit confirmation:
 
 ```
-You: "Update all plugins on all sites"
-Claude: "This would update plugins on 15 sites. Please confirm you want to proceed."
+You: Update all themes everywhere
+
+Claude: ⚠️ Bulk Operation Warning
+
+This will affect 15 sites and update 23 themes.
+
+Type "confirm bulk themes update" to proceed, or specify sites:
+- "update themes on sites 1, 3, 5"
+- "update themes on e-commerce sites only"
 ```
 
-**To disable this safeguard** (not recommended):
+**To disable** (not recommended):
 ```bash
 MAINWP_REQUIRE_CONFIRMATION_BULK=false
 ```
 
-### Test Mode (No Side Effects)
+### Test Mode
 
-For smoke testing or demos, you can enable test mode to prevent any changes while still exercising tool paths:
+For demonstrations or development, enable test mode to simulate all operations without making API calls:
 
 ```bash
 MAINWP_TEST_MODE=true
 ```
 
-When enabled, mutating tools return simulated results and make no API calls.
+In test mode, mutating tools return realistic responses without side effects.
 
 ### Rate Limiting
 
-The server enforces rate limiting to prevent overwhelming your MainWP Dashboard:
+Protect your MainWP Dashboard from being overwhelmed:
 
-- Default: 60 requests per minute
-- Requests exceeding the limit return an error with a retry delay
-- Prevents accidental DoS of your own infrastructure
-
-**To adjust the rate limit**:
 ```bash
-MAINWP_RATE_LIMIT_PER_MINUTE=30  # More conservative
-MAINWP_RATE_LIMIT_PER_MINUTE=120 # More aggressive
+# Conservative (for shared hosting)
+MAINWP_RATE_LIMIT_PER_MINUTE=30
+
+# Aggressive (for dedicated servers)
+MAINWP_RATE_LIMIT_PER_MINUTE=120
 ```
+
+When rate limited, the server returns an error with a suggested retry delay.
 
 ---
 
@@ -974,57 +717,94 @@ MAINWP_RATE_LIMIT_PER_MINUTE=120 # More aggressive
 
 ### Server Won't Start
 
-**Error: "Missing required environment variables"**
+#### "Missing required environment variables"
 
-Ensure `MAINWP_DASHBOARD_URL` and `MAINWP_API_KEY` are set. Check:
-- `.env.local` exists and has the correct values
-- If using MCP config, the `env` block has both variables
+**Cause:** `MAINWP_DASHBOARD_URL` or `MAINWP_API_KEY` not set.
 
-**Error: "Cannot find module"**
+**Solution:**
+```bash
+# Check if .env.local exists
+ls -la .env.local
 
-Run `npm run build` to compile TypeScript.
+# Verify variables are set
+grep "MAINWP_" .env.local
+
+# If using MCP config, verify the env block in mcp.json
+```
+
+#### "Cannot find module"
+
+**Cause:** TypeScript not compiled.
+
+**Solution:**
+```bash
+npm run build
+```
 
 ### API Connection Issues
 
-**Error: "401 Unauthorized"**
+#### "401 Unauthorized"
 
-- Verify your API key is correct
-- Check the format: `consumer_key==consumer_secret` (double equals)
-- Ensure the API key hasn't been revoked in MainWP
+**Causes & Solutions:**
 
-**Error: "Connection refused" or timeout**
+| Cause | Solution |
+|-------|----------|
+| Wrong API key format | Ensure `key==secret` with double equals |
+| Key revoked | Generate new API key in MainWP Dashboard |
+| Insufficient permissions | Enable read+write permissions for the API key |
+| URL mismatch | Verify `MAINWP_DASHBOARD_URL` matches exactly |
 
-- Verify `MAINWP_DASHBOARD_URL` is correct and accessible
-- Check your MainWP Dashboard is running
-- Ensure your firewall allows the connection
+#### "Connection refused" or timeout
+
+**Checklist:**
+- [ ] MainWP Dashboard is accessible in browser
+- [ ] No firewall blocking the connection
+- [ ] HTTPS certificate is valid (not expired)
+- [ ] WordPress is not in maintenance mode
+
+**Test connectivity:**
+```bash
+curl -H "Authorization: Bearer YOUR_KEY==YOUR_SECRET" \
+  https://your-dashboard.com/wp-json/mainwp/v2/sites
+```
 
 ### Claude Code Integration Issues
 
-**Tools not appearing in Claude Code**
+#### Tools not appearing
 
-1. Verify `mcp.json` syntax is valid JSON
-2. Check the path to `dist/index.js` is absolute and correct
-3. Restart Claude Code completely after config changes
-4. Check Claude Code logs for MCP connection errors
+**Diagnostic steps:**
+1. Verify `mcp.json` is valid JSON: `cat ~/.config/claude-code/mcp.json | python -m json.tool`
+2. Check path to `dist/index.js` is absolute: `realpath /your/path/dist/index.js`
+3. Restart Claude Code completely (not just the conversation)
+4. Check Claude Code logs: `~/.config/claude-code/logs/`
 
-**Permission errors**
+#### Permission errors
 
-- Ensure the API key has the required permissions in MainWP
-- Check that read/write permissions match what you're trying to do
+**Symptom:** "You don't have permission to..."
+
+**Solution:**
+1. Go to MainWP Dashboard → Settings → REST API
+2. Find your API key
+3. Click "Edit" and enable required permissions
+4. Regenerate key if needed
 
 ### MainWP Dashboard Issues
 
-**Sites showing as disconnected**
+#### Sites showing as disconnected
 
-- Run a sync: Use `mainwp_sites_sync` tool
-- Check the MainWP Child plugin is active on the child site
-- Verify the child site is accessible from your Dashboard
+**Resolution steps:**
+1. Check child site is accessible: `curl -I https://child-site.com`
+2. Verify MainWP Child plugin is active
+3. Try manual sync in MainWP Dashboard
+4. Check for SSL certificate issues
+5. Review MainWP Dashboard error logs
 
-**Updates not showing**
+#### Updates not appearing
 
-- Force a sync on the site
-- Check that MainWP Dashboard has recent sync data
-- Verify the MainWP Child plugin version is compatible
+**Common causes:**
+- Site hasn't synced recently (force sync with `mainwp_sites_sync`)
+- Child plugin version incompatible (update to latest)
+- WordPress cron not running (check `wp-cron.php`)
 
 ---
 
@@ -1041,19 +821,24 @@ mainwp-mcp/
 │   │   └── mainwp-api-client.ts # REST API HTTP client
 │   ├── tools/
 │   │   ├── index.ts             # Tool registration
-│   │   ├── site-tools.ts        # Site management tools
-│   │   ├── update-tools.ts      # Update tools
-│   │   ├── plugin-tools.ts      # Plugin tools
-│   │   └── theme-tools.ts       # Theme tools
+│   │   ├── site-tools.ts        # Site management
+│   │   ├── update-tools.ts      # Update management
+│   │   ├── plugin-tools.ts      # Plugin management
+│   │   ├── theme-tools.ts       # Theme management
+│   │   ├── client-tools.ts      # Client CRM (Pro)
+│   │   ├── cost-tools.ts        # Cost tracking (Pro)
+│   │   └── tag-tools.ts         # Tag management
 │   ├── types/
 │   │   └── mainwp-types.ts      # TypeScript interfaces
 │   ├── schemas/
-│   │   └── tool-schemas.ts      # Zod validation schemas
+│   │   └── tool-schemas.ts      # Zod validation
 │   └── utils/
-│       ├── safety.ts            # Dry-run & confirmation logic
+│       ├── safety.ts            # Dry-run & confirmation
 │       └── error-handling.ts    # Error utilities
-├── dist/                        # Compiled JavaScript (git-ignored)
-├── .env.example                 # Environment template
+├── dist/                        # Compiled JavaScript
+├── scripts/
+│   └── mcp-smoke-test.mjs       # Integration tests
+├── .env.example                 # Configuration template
 ├── .env.local                   # Your config (git-ignored)
 ├── package.json
 ├── tsconfig.json
@@ -1066,7 +851,7 @@ mainwp-mcp/
 # Install dependencies
 npm install
 
-# Run in development mode (with hot reload via tsx)
+# Development mode with hot reload
 npm run dev
 
 # Build for production
@@ -1077,28 +862,33 @@ npm start
 
 # Clean build artifacts
 npm run clean
+
+# Run smoke tests
+npm run smoke-test
 ```
 
 ### Adding New Tools
 
-1. Create or edit a file in `src/tools/`
-2. Define the tool schema in `src/schemas/tool-schemas.ts`
-3. Register the tool in `src/tools/index.ts`
-4. Add corresponding API method in `src/clients/mainwp-api-client.ts`
-5. Rebuild: `npm run build`
+1. **Define schema** in `src/schemas/tool-schemas.ts`
+2. **Implement handler** in appropriate `src/tools/*.ts` file
+3. **Register tool** in `src/tools/index.ts`
+4. **Add API method** in `src/clients/mainwp-api-client.ts`
+5. **Rebuild** with `npm run build`
+6. **Test** with Claude Code
 
 ### Testing
 
 ```bash
-# Test API connection manually
-curl -H "Authorization: Bearer YOUR_KEY==YOUR_SECRET" \
-  https://your-dashboard.com/wp-json/mainwp/v2/sites
+# Manual API test
+curl -H "Authorization: Bearer KEY==SECRET" \
+  https://dashboard.com/wp-json/mainwp/v2/sites
 
-# Run a safe smoke test of all tools (test mode, no side effects)
-npm run smoke-test
+# Smoke test (safe, no side effects)
+MAINWP_TEST_MODE=true npm run smoke-test
 
-# Run the server and test with Claude Code
+# Test with Claude Code
 npm start
+# Then in Claude Code: "List all sites"
 ```
 
 ---
@@ -1109,7 +899,7 @@ This server uses the [MainWP REST API v2](https://mainwp.com/kb/mainwp-rest-api/
 
 ### Authentication
 
-All requests use Bearer token authentication:
+Bearer token authentication:
 ```
 Authorization: Bearer {consumer_key}=={consumer_secret}
 ```
@@ -1120,7 +910,7 @@ Authorization: Bearer {consumer_key}=={consumer_secret}
 https://your-dashboard.com/wp-json/mainwp/v2/
 ```
 
-### Key Endpoints Used
+### Key Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -1137,28 +927,35 @@ For complete API documentation, see the [MainWP REST API Documentation](https://
 
 ## Contributing
 
-Contributions are welcome! Please:
+We welcome contributions! Here's how to get started:
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/my-feature`
-3. Make your changes
-4. Run `npm run build` to ensure it compiles
-5. Commit your changes: `git commit -m "Add my feature"`
-6. Push to your fork: `git push origin feature/my-feature`
-7. Open a Pull Request
+1. **Fork** the repository
+2. **Create a branch:** `git checkout -b feature/your-feature`
+3. **Make changes** with clear, focused commits
+4. **Build and test:** `npm run build && npm run smoke-test`
+5. **Submit a Pull Request** with a clear description
 
-### Guidelines
+### Contribution Guidelines
 
-- Follow existing code style
-- Add TypeScript types for new code
+- Follow existing TypeScript style
+- Add types for all new code
 - Update documentation for new features
 - Test with a real MainWP Dashboard before submitting
+- Keep commits focused and atomic
+
+### Reporting Issues
+
+When reporting bugs, please include:
+- Node.js version: `node --version`
+- MainWP Dashboard version
+- Error message and stack trace
+- Steps to reproduce
 
 ---
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
@@ -1166,8 +963,16 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - [MainWP](https://mainwp.com/) for the excellent WordPress management platform
 - [Anthropic](https://anthropic.com/) for Claude and the MCP protocol
-- The open-source community for the excellent TypeScript tooling
+- The TypeScript community for outstanding developer tooling
+
+---
 
 ## Development Status
 
-See [project_status.md](./project_status.md) for recent development activity and context.
+See [project_status.md](./project_status.md) for recent development activity.
+
+---
+
+<p align="center">
+  <sub>Built with ❤️ by <a href="https://github.com/cvsloane">Heaviside Group</a></sub>
+</p>
