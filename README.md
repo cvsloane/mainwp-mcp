@@ -346,7 +346,7 @@ List all connected WordPress sites.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `status` | string | No | Filter by status: `connected`, `disconnected`, `all` |
+| `format` | string | No | Response format: `full` (all details) or `basic` (id, name, url, status) |
 
 **Example Response:**
 ```json
@@ -372,7 +372,7 @@ Get detailed information for a specific site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID from MainWP |
+| `site` | string | Yes | Site ID (number) or domain name (e.g., "1" or "example.com") |
 
 **Returns:** Comprehensive site data including plugins, themes, health score, database size, etc.
 
@@ -387,7 +387,8 @@ Force synchronization of site data.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to sync |
+| `site` | string | No | Site ID or domain to sync. Omit to sync all sites. |
+| `confirmed` | boolean | No | Confirm bulk operation when syncing all sites |
 
 #### `mainwp_sites_check`
 Run a health check on a site.
@@ -395,7 +396,7 @@ Run a health check on a site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to check |
+| `site` | string | Yes | Site ID or domain to check |
 
 #### `mainwp_sites_add`
 Add a new site to MainWP Dashboard.
@@ -404,8 +405,11 @@ Add a new site to MainWP Dashboard.
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `url` | string | Yes | The site URL |
-| `admin_username` | string | Yes | WordPress admin username |
+| `admin` | string | No | WordPress admin username |
 | `name` | string | No | Display name for the site |
+| `ssl_verify` | boolean | No | Verify SSL certificate (default: true) |
+| `groupids` | string | No | Comma-separated group IDs |
+| `uniqueId` | string | No | MainWP Child unique security ID |
 
 #### `mainwp_sites_reconnect`
 Reconnect a disconnected site.
@@ -413,7 +417,7 @@ Reconnect a disconnected site.
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to reconnect |
+| `site` | string | Yes | Site ID or domain to reconnect |
 
 #### `mainwp_sites_disconnect`
 Disconnect a site from MainWP (does not delete the site).
@@ -421,7 +425,7 @@ Disconnect a site from MainWP (does not delete the site).
 **Parameters:**
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
-| `site_id` | string | Yes | The site ID to disconnect |
+| `site` | string | Yes | Site ID or domain to disconnect |
 
 ---
 
