@@ -17,6 +17,10 @@ import {
 const SERVER_NAME = 'mainwp-mcp';
 const SERVER_VERSION = '1.0.0';
 
+/**
+ * Create and configure the MainWP MCP Server
+ * @returns Promise resolving to configured McpServer instance
+ */
 export async function createServer(): Promise<McpServer> {
   const server = new McpServer({
     name: SERVER_NAME,
@@ -35,6 +39,10 @@ export async function createServer(): Promise<McpServer> {
   return server;
 }
 
+/**
+ * Start the MainWP MCP Server with stdio transport
+ * @returns Promise that resolves when the server is started
+ */
 export async function startServer(): Promise<void> {
   const server = await createServer();
   const transport = new StdioServerTransport();
