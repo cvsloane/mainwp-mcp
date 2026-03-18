@@ -37,8 +37,8 @@
   "author": "Heaviside Group",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0",
-    "axios": "^1.7.9",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "axios": "^1.13.6",
     "dotenv": "^16.4.7",
     "zod": "^3.24.1"
   },
@@ -46,6 +46,9 @@
     "@types/node": "^22.10.5",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "ajv": "^8.18.0"
   },
   "engines": {
     "node": ">=18.0.0"
