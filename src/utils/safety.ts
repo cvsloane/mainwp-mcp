@@ -8,7 +8,7 @@ import type { ToolResult } from '../types/mainwp-types.js';
  * Check if dry-run mode is enabled by default
  */
 export function isDryRunDefault(): boolean {
-  return process.env.MAINWP_ENABLE_DRY_RUN_BY_DEFAULT === 'true';
+  return process.env.MAINWP_ENABLE_DRY_RUN_BY_DEFAULT !== 'false';
 }
 
 /**
@@ -30,7 +30,7 @@ export function isTestMode(): boolean {
  * Check if bulk operations require confirmation
  */
 export function requiresBulkConfirmation(): boolean {
-  return process.env.MAINWP_REQUIRE_CONFIRMATION_BULK === 'true';
+  return process.env.MAINWP_REQUIRE_CONFIRMATION_BULK !== 'false';
 }
 
 /**
